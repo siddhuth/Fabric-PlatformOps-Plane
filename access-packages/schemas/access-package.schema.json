@@ -1,0 +1,157 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://fabric-access-platform/schemas/access-package.schema.json",
+  "title": "Fabric Access Package Definition",
+  "description": "Schema for validating persona-based access package YAML definitions.",
+  "type": "object",
+  "required": ["package", "grants"],
+  "properties": {
+    "package": {
+      "type": "object",
+      "required": ["name", "entra_group", "approval_policy"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[a-z0-9-]+$",
+          "description": "Unique identifier for the access package (kebab-case)."
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+$"
+        },
+        "entra_group": {
+          "type": "string",
+          "pattern": "^sg-fabric-",
+          "description": "Entra security group name. Must start with 'sg-fabric-'."
+        },
+        "approval_policy": {
+          "type": "string",
+          "enum": ["manager-only", "manager-plus-platform", "platform-team-only", "auto-approve"]
+        },
+        "expiration_days": {
+          "type": ["integer", "null"],
+          "minimum": 1,
+          "maximum": 365
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    },
+    "grants": {
+      "type": "object",
+      "required": ["workspace"],
+      "properties": {
+        "workspace": {
+          "type": "object",
+          "required": ["id", "role"],
+          "properties": {
+            "id": { "type": "string" },
+            "role": {
+              "type": "string",
+              "enum": ["Admin", "Member", "Contributor", "Viewer"]
+            }
+          }
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["type", "name", "permissions"],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "MirroredDatabase", "Lakehouse", "Warehouse",
+                  "SemanticModel", "Report", "DataPipeline",
+                  "Notebook", "SQLEndpoint", "KQLDatabase",
+                  "Eventstream", "MLModel"
+                ]
+              },
+              "name": { "type": "string" },
+              "permissions": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": ["Read", "ReadAll", "Write", "Execute", "Reshare", "Build"]
+                },
+                "minItems": 1
+              },
+              "additional_permissions": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": ["ReadAllApacheSpark", "ReadAllSql", "SubscribeOneLakeEvents"]
+                }
+              }
+            }
+          }
+        },
+        "compute": {
+          "type": "object",
+          "properties": {
+            "sql_endpoint": {
+              "type": "object",
+              "properties": {
+                "grants": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                },
+                "deny": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                },
+                "rls_role": { "type": ["string", "null"] }
+              }
+            },
+            "onelake": {
+              "type": "object",
+              "properties": {
+                "security_role": { "type": ["string", "null"] },
+                "paths": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                }
+              }
+            },
+            "semantic_model": {
+              "type": "object",
+              "properties": {
+                "rls_role": { "type": ["string", "null"] },
+                "ols_restrictions": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "hide": { "type": "string" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "required": ["owner", "domain"],
+      "properties": {
+        "owner": { "type": "string" },
+        "domain": { "type": "string" },
+        "sensitivity": {
+          "type": "string",
+          "enum": ["public", "internal", "confidential", "highly-confidential"]
+        },
+        "last_reviewed": {
+          "type": "string",
+          "format": "date"
+        },
+        "review_cadence_days": {
+          "type": "integer",
+          "minimum": 30
+        }
+      }
+    }
+  }
+}

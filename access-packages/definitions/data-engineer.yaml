@@ -1,0 +1,64 @@
+# access-packages/definitions/data-engineer.yaml
+#
+# Access package for the Data Engineer persona.
+# Grants Contributor-level workspace access with ReadAll item permissions
+# and write access to staging schemas via SQL endpoint.
+
+package:
+  name: data-engineer-sales-lakehouse
+  version: "1.2"
+  entra_group: sg-fabric-de-sales
+  approval_policy: manager-plus-platform
+  expiration_days: 180
+  description: >
+    Data engineers working on the sales domain lakehouse.
+    Full read access to mirrored data, write access to staging schemas,
+    and direct OneLake file access for ETL workloads.
+
+grants:
+  workspace:
+    id: ${WORKSPACE_SALES_ID}
+    role: Contributor
+
+  items:
+    - type: MirroredDatabase
+      name: sales-mirror-db
+      permissions:
+        - Read
+        - ReadAll
+      additional_permissions:
+        - ReadAllApacheSpark  # Direct OneLake/Spark access
+
+    - type: SemanticModel
+      name: sales-default-model
+      permissions:
+        - Read
+
+    - type: SQLEndpoint
+      name: sales-mirror-db-sqle
+      permissions:
+        - Read
+        - ReadAllSql  # Read all SQL endpoint data
+
+  compute:
+    sql_endpoint:
+      grants:
+        - GRANT SELECT ON SCHEMA::staging TO [${ENTRA_GROUP_SID}]
+        - GRANT INSERT ON SCHEMA::staging TO [${ENTRA_GROUP_SID}]
+        - GRANT CREATE TABLE TO [${ENTRA_GROUP_SID}]
+      deny:
+        - DENY DELETE ON SCHEMA::curated TO [${ENTRA_GROUP_SID}]
+      rls_role: data_engineer_role
+
+    onelake:
+      security_role: de-read-tables
+      paths:
+        - "/Tables/*"
+        - "/Files/staging/*"
+
+metadata:
+  owner: platform-team
+  domain: sales
+  sensitivity: confidential
+  last_reviewed: "2026-03-01"
+  review_cadence_days: 90

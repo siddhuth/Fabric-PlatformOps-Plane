@@ -1,0 +1,62 @@
+# access-packages/definitions/analytics-team.yaml
+#
+# Access package for the Analytics Team persona.
+# Read access with Build permission on semantic models, enabling
+# self-service report creation in Power BI.
+
+package:
+  name: analytics-team-sales
+  version: "1.1"
+  entra_group: sg-fabric-analytics-sales
+  approval_policy: manager-only
+  expiration_days: 365
+  description: >
+    Business analysts and report builders who consume sales domain data
+    through semantic models and Power BI. Can create their own reports
+    but cannot modify underlying data or lakehouse objects.
+
+grants:
+  workspace:
+    id: ${WORKSPACE_SALES_ID}
+    role: Viewer
+
+  items:
+    - type: MirroredDatabase
+      name: sales-mirror-db
+      permissions:
+        - Read
+
+    - type: SemanticModel
+      name: sales-default-model
+      permissions:
+        - Read
+        - Build   # Enables "Build" permission — connect via PBI Desktop / Excel
+
+    - type: Report
+      name: sales-executive-dashboard
+      permissions:
+        - Read
+        - Reshare  # Can share reports with others who have model access
+
+  compute:
+    sql_endpoint:
+      grants:
+        - GRANT SELECT ON SCHEMA::analytics TO [${ENTRA_GROUP_SID}]
+      deny:
+        - DENY SELECT ON SCHEMA::staging TO [${ENTRA_GROUP_SID}]
+        - DENY SELECT ON SCHEMA::raw TO [${ENTRA_GROUP_SID}]
+      rls_role: analytics_team_role
+
+    onelake:
+      security_role: null  # No direct OneLake access
+
+    semantic_model:
+      rls_role: analytics_rls
+      # RLS restricts to the analyst's region/BU via DAX filter
+
+metadata:
+  owner: analytics-lead
+  domain: sales
+  sensitivity: internal
+  last_reviewed: "2026-03-01"
+  review_cadence_days: 180

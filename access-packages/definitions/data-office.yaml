@@ -1,0 +1,57 @@
+# access-packages/definitions/data-office.yaml
+#
+# Access package for the Data Office / Data Steward persona.
+# Read-only access scoped to curated views and semantic model reporting.
+# No direct SQL write, OneLake, or Spark access.
+
+package:
+  name: data-office-sales-viewer
+  version: "1.0"
+  entra_group: sg-fabric-do-sales
+  approval_policy: manager-only
+  expiration_days: 365
+  description: >
+    Data stewards and governance team members who need visibility into
+    sales domain data for quality monitoring, lineage review, and
+    compliance reporting. View-only access.
+
+grants:
+  workspace:
+    id: ${WORKSPACE_SALES_ID}
+    role: Viewer
+
+  items:
+    - type: MirroredDatabase
+      name: sales-mirror-db
+      permissions:
+        - Read  # Metadata and report viewing only
+
+    - type: SemanticModel
+      name: sales-default-model
+      permissions:
+        - Read
+      # No Build permission — cannot create new reports on this model
+
+  compute:
+    sql_endpoint:
+      grants:
+        - GRANT SELECT ON SCHEMA::curated TO [${ENTRA_GROUP_SID}]
+      deny:
+        - DENY SELECT ON SCHEMA::staging TO [${ENTRA_GROUP_SID}]
+        - DENY SELECT ON SCHEMA::raw TO [${ENTRA_GROUP_SID}]
+      rls_role: data_office_viewer_role
+
+    onelake:
+      security_role: null  # No direct OneLake access
+
+    semantic_model:
+      rls_role: steward_rls
+      ols_restrictions:
+        - hide: pii_columns  # OLS hides PII fields from steward view
+
+metadata:
+  owner: platform-team
+  domain: sales
+  sensitivity: internal
+  last_reviewed: "2026-03-01"
+  review_cadence_days: 180
