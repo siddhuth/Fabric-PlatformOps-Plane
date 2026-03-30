@@ -7,6 +7,9 @@ across Fabric's three security layers:
   2. Item permissions   → Power BI REST API (sharing endpoints)
   3. Compute security   → Handled separately via sql_grants.py
 
+Also implements the PlatformProvider interface for use with the
+provider_registry, enabling multi-platform provisioning dispatch.
+
 Authentication uses MSAL with a service principal (client credentials flow).
 The SPN must be:
   - Registered in Entra ID with Power BI Service API permissions
@@ -17,6 +20,10 @@ Usage:
     client = FabricClient.from_environment()
     client.assign_workspace_role(workspace_id, principal_id, "Contributor")
     client.share_item(workspace_id, item_id, recipient_email, ["Read", "ReadAll"])
+
+    # Or via provider interface:
+    provider = FabricProvider.from_environment()
+    results = provider.provision(package, user_id, user_email)
 """
 
 import os
@@ -28,6 +35,8 @@ from typing import Optional
 
 import requests
 from msal import ConfidentialClientApplication
+
+from provider_registry import PlatformProvider, ProvisioningResult as RegistryResult, DriftFinding
 
 logger = logging.getLogger(__name__)
 
@@ -330,3 +339,220 @@ class FabricClient:
                 if item_type is None or item["type"] == item_type:
                     return item
         return None
+
+
+# ---------------------------------------------------------------------------
+# Provider Interface (wraps FabricClient for provider_registry dispatch)
+# ---------------------------------------------------------------------------
+class FabricProvider(PlatformProvider):
+    """
+    PlatformProvider implementation for Microsoft Fabric.
+
+    Wraps the existing FabricClient methods to conform to the provider
+    registry interface, enabling multi-platform provisioning dispatch.
+    """
+
+    def __init__(self, client: FabricClient):
+        self._client = client
+
+    @classmethod
+    def from_environment(cls) -> "FabricProvider":
+        return cls(FabricClient.from_environment())
+
+    @property
+    def platform_name(self) -> str:
+        return "fabric"
+
+    def provision(self, package: dict, user_id: str,
+                  user_email: str) -> list[RegistryResult]:
+        results = []
+        grants = package.get("grants", {})
+
+        # Layer 1: Workspace role
+        ws_config = grants.get("workspace", {})
+        workspace_id = self._resolve_env(ws_config.get("id", ""))
+        role = ws_config.get("role", "Viewer")
+
+        if workspace_id and role:
+            r = self._client.assign_workspace_role(
+                workspace_id=workspace_id,
+                principal_id=user_id,
+                principal_type="User",
+                role=role,
+            )
+            results.append(RegistryResult(
+                platform="fabric", layer=r.layer, target=r.target,
+                action=r.action, success=r.success, detail=r.detail,
+                principal_id=r.principal_id,
+            ))
+
+        # Layer 2: Item sharing
+        for item_cfg in grants.get("items", []):
+            item_name = item_cfg.get("name")
+            item_type = item_cfg.get("type")
+            permissions = item_cfg.get("permissions", ["Read"])
+
+            if workspace_id and item_name:
+                item = self._client.find_item_by_name(workspace_id, item_name, item_type)
+                if item:
+                    r = self._client.share_item(
+                        workspace_id=workspace_id,
+                        item_id=item["id"],
+                        recipient_id=user_id,
+                        recipient_type="User",
+                        permissions=permissions,
+                    )
+                    results.append(RegistryResult(
+                        platform="fabric", layer=r.layer, target=r.target,
+                        action=r.action, success=r.success, detail=r.detail,
+                        principal_id=r.principal_id,
+                    ))
+                else:
+                    results.append(RegistryResult(
+                        platform="fabric", layer="item", target=item_name,
+                        action="share_item", success=False,
+                        detail=f"Item not found: {item_name} ({item_type})",
+                        principal_id=user_id,
+                    ))
+
+        # Layer 3: SQL grants (delegated to sql_grants module)
+        sql_config = grants.get("compute", {}).get("sql_endpoint", {})
+        if sql_config.get("grants") or sql_config.get("deny"):
+            try:
+                from sql_grants import provision_sql_access
+                sql_results = provision_sql_access(
+                    access_package=package,
+                    variables={
+                        "ENTRA_GROUP_SID": package["package"]["entra_group"],
+                        "PRINCIPAL_NAME": user_email,
+                    },
+                    server=os.environ.get("FABRIC_SQL_SERVER", ""),
+                    database=os.environ.get("FABRIC_SQL_DATABASE", ""),
+                    tenant_id=os.environ["AZURE_TENANT_ID"],
+                    client_id=os.environ["FABRIC_CLIENT_ID"],
+                    client_secret=os.environ["FABRIC_CLIENT_SECRET"],
+                )
+                for sr in sql_results:
+                    results.append(RegistryResult(
+                        platform="fabric", layer="compute",
+                        target=sr.script.description, action="sql_grant",
+                        success=sr.success, detail=sr.error or "OK",
+                        principal_id=user_id,
+                    ))
+            except Exception as e:
+                logger.error(f"SQL grants failed: {e}")
+                results.append(RegistryResult(
+                    platform="fabric", layer="compute", target="sql_endpoint",
+                    action="sql_grant", success=False, detail=str(e),
+                    principal_id=user_id,
+                ))
+
+        return results
+
+    def revoke(self, package: dict, user_id: str,
+               user_email: str) -> list[RegistryResult]:
+        results = []
+        grants = package.get("grants", {})
+
+        # Remove workspace role
+        ws_config = grants.get("workspace", {})
+        workspace_id = self._resolve_env(ws_config.get("id", ""))
+        if workspace_id:
+            r = self._client.remove_workspace_role(workspace_id, user_id)
+            results.append(RegistryResult(
+                platform="fabric", layer=r.layer, target=r.target,
+                action=r.action, success=r.success, detail=r.detail,
+                principal_id=r.principal_id,
+            ))
+
+        # Log item revocations for manual review
+        for item_cfg in grants.get("items", []):
+            results.append(RegistryResult(
+                platform="fabric", layer="item",
+                target=item_cfg.get("name", "unknown"),
+                action="revoke_item", success=True,
+                detail="Item permission revocation logged for manual review",
+                principal_id=user_id,
+            ))
+
+        # Revoke SQL grants
+        sql_config = grants.get("compute", {}).get("sql_endpoint", {})
+        if sql_config:
+            try:
+                from sql_grants import revoke_sql_access
+                sql_results = revoke_sql_access(
+                    access_package=package,
+                    variables={
+                        "ENTRA_GROUP_SID": package["package"]["entra_group"],
+                        "PRINCIPAL_NAME": user_email,
+                    },
+                    server=os.environ.get("FABRIC_SQL_SERVER", ""),
+                    database=os.environ.get("FABRIC_SQL_DATABASE", ""),
+                    tenant_id=os.environ["AZURE_TENANT_ID"],
+                    client_id=os.environ["FABRIC_CLIENT_ID"],
+                    client_secret=os.environ["FABRIC_CLIENT_SECRET"],
+                )
+                for sr in sql_results:
+                    results.append(RegistryResult(
+                        platform="fabric", layer="compute",
+                        target=sr.script.description, action="sql_revoke",
+                        success=sr.success, detail=sr.error or "OK",
+                        principal_id=user_id,
+                    ))
+            except Exception as e:
+                logger.error(f"SQL revocation failed: {e}")
+
+        return results
+
+    def detect_drift(self, packages: dict) -> list[DriftFinding]:
+        findings = []
+
+        for pkg_name, pkg in packages.items():
+            grants = pkg.get("grants", {})
+            ws_config = grants.get("workspace", {})
+            workspace_id = self._resolve_env(ws_config.get("id", ""))
+            group_name = pkg.get("package", {}).get("entra_group", "")
+            expected_role = ws_config.get("role", "")
+
+            if not workspace_id:
+                continue
+
+            try:
+                import requests as req
+                resp = req.get(
+                    f"{PBI_API_BASE}/groups/{workspace_id}/users",
+                    headers={"Authorization": f"Bearer {self._client.pbi_token}"},
+                    timeout=30,
+                )
+                if resp.status_code != 200:
+                    continue
+
+                for user in resp.json().get("value", []):
+                    if (user.get("identifier") == group_name or
+                            user.get("displayName") == group_name):
+                        actual_role = user.get("groupUserAccessRight", "")
+                        if actual_role != expected_role:
+                            role_ranks = {"Viewer": 1, "Contributor": 2, "Member": 3, "Admin": 4}
+                            category = ("over_provisioned"
+                                        if role_ranks.get(actual_role, 0) > role_ranks.get(expected_role, 0)
+                                        else "under_provisioned")
+                            findings.append(DriftFinding(
+                                platform="fabric",
+                                category=category,
+                                severity="high" if category == "over_provisioned" else "medium",
+                                securable=f"workspace:{workspace_id}",
+                                principal=group_name,
+                                declared=expected_role,
+                                actual=actual_role,
+                                package=pkg_name,
+                            ))
+            except Exception as e:
+                logger.error(f"Drift check failed for {pkg_name}: {e}")
+
+        return findings
+
+    @staticmethod
+    def _resolve_env(ref: str) -> str:
+        if ref.startswith("${") and ref.endswith("}"):
+            return os.environ.get(ref[2:-1], "")
+        return ref
