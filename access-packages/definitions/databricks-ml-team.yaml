@@ -1,0 +1,128 @@
+# access-packages/definitions/databricks-ml-team.yaml
+#
+# Access package for the ML Engineering persona on Azure Databricks.
+# Grants Unity Catalog privileges for model registry, feature tables,
+# experiment tracking, and model serving endpoints.
+
+package:
+  name: databricks-ml-team-sales
+  version: "1.0"
+  entra_group: sg-fabric-ml-sales
+  approval_policy: manager-plus-platform
+  expiration_days: 365
+  description: >
+    ML engineers building and deploying models on sales domain data.
+    Read access to curated data schemas, full access to the ML catalog
+    for models, experiments, and feature tables. Compute access via
+    ML-optimized cluster policy and model serving endpoints.
+
+grants:
+  workspace:
+    id: ${DATABRICKS_WORKSPACE_ID}
+    role: Contributor
+
+platforms:
+  databricks:
+    identity:
+      scim_group: sg-fabric-ml-sales
+
+    entitlements:
+      - workspace-access
+      - databricks-sql-access
+      - allow-cluster-create
+
+    unity_catalog:
+      grants:
+        # Sales catalog — read curated data for feature engineering
+        - securable_type: Catalog
+          securable_name: sales_catalog
+          privileges:
+            - USE_CATALOG
+            - BROWSE
+
+        - securable_type: Schema
+          securable_name: sales_catalog.curated
+          privileges:
+            - USE_SCHEMA
+            - SELECT
+
+        # ML catalog — full access for models, features, experiments
+        - securable_type: Catalog
+          securable_name: ml_catalog
+          privileges:
+            - USE_CATALOG
+            - CREATE_SCHEMA
+
+        - securable_type: Schema
+          securable_name: ml_catalog.models
+          privileges:
+            - USE_SCHEMA
+            - CREATE_MODEL
+            - CREATE_FUNCTION
+            - CREATE_TABLE
+            - SELECT
+            - MODIFY
+
+        - securable_type: Schema
+          securable_name: ml_catalog.features
+          privileges:
+            - USE_SCHEMA
+            - CREATE_TABLE
+            - SELECT
+            - MODIFY
+
+        # Registered models — deploy and serve
+        - securable_type: Schema
+          securable_name: ml_catalog.serving
+          privileges:
+            - USE_SCHEMA
+            - CREATE_MODEL
+            - SELECT
+            - MODIFY
+
+        # Volumes for model artifacts
+        - securable_type: Volume
+          securable_name: ml_catalog.models.artifacts
+          privileges:
+            - READ_VOLUME
+            - WRITE_VOLUME
+
+    workspace_acls:
+      - object_type: ClusterPolicy
+        object_ref: ${ML_CLUSTER_POLICY_ID}
+        permission_level: CAN_USE
+
+      - object_type: SQLWarehouse
+        object_ref: ${SALES_SQL_WAREHOUSE_ID}
+        permission_level: CAN_USE
+
+      - object_type: ServingEndpoint
+        object_ref: ${SALES_SERVING_ENDPOINT_ID}
+        permission_level: CAN_MANAGE
+
+      - object_type: Experiment
+        object_ref: ${ML_EXPERIMENTS_DIR_ID}
+        permission_level: CAN_EDIT
+
+      - object_type: DLTPipeline
+        object_ref: ${ML_FEATURE_PIPELINE_ID}
+        permission_level: CAN_RUN
+
+      - object_type: Job
+        object_ref: ${ML_TRAINING_JOB_ID}
+        permission_level: CAN_MANAGE_RUN
+
+      - object_type: Notebook
+        object_ref: ${ML_NOTEBOOKS_DIR_ID}
+        permission_level: CAN_EDIT
+
+    compute_policy:
+      cluster_policy: ml-gpu-policy
+      sql_warehouse: sales-sql-warehouse
+
+metadata:
+  owner: ml-platform-lead
+  domain: sales
+  sensitivity: confidential
+  last_reviewed: "2026-03-15"
+  review_cadence_days: 90

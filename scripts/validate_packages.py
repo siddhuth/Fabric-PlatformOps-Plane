@@ -9,6 +9,10 @@ schema and performs additional business logic checks:
   - Permission escalation detection (Viewer role + Write permissions)
   - Cross-package conflict detection (same group in multiple packages)
   - Metadata freshness (review dates not stale)
+  - Databricks: UC prerequisite chain (USE CATALOG + USE SCHEMA required)
+  - Databricks: No DENY enforcement (positive-permission-only)
+  - Databricks: Entitlement requirements for workspace ACLs
+  - Snowflake: Not-yet-supported warning
 
 Exit code 0 = all valid, 1 = validation errors found.
 
@@ -98,8 +102,16 @@ def validate_all(strict: bool = False) -> ValidationResult:
         # JSON Schema validation
         _validate_schema(pkg, schema, filename, result)
 
-        # Business logic validation
+        # Business logic validation (Fabric)
         _validate_business_rules(pkg, filename, result, strict)
+
+        # Platform-specific validation
+        platforms = pkg.get("platforms", {})
+        if "databricks" in platforms:
+            _validate_databricks(pkg, filename, result)
+        if "snowflake" in platforms:
+            result.warn(filename, "Snowflake platform is not yet supported. "
+                                  "Package will pass validation but cannot be provisioned.")
 
     # Cross-package validation
     _validate_cross_package(packages, result)
@@ -129,7 +141,7 @@ def _validate_business_rules(pkg: dict, filename: str, result: ValidationResult,
     if not group_name.startswith("sg-fabric-"):
         result.error(filename, f"Group name '{group_name}' must start with 'sg-fabric-'")
 
-    # Rule 2: Permission escalation detection
+    # Rule 2: Permission escalation detection (Fabric items)
     ws_role = grants.get("workspace", {}).get("role", "")
     items = grants.get("items", [])
 
@@ -184,22 +196,144 @@ def _validate_business_rules(pkg: dict, filename: str, result: ValidationResult,
             result.error(filename, f"Unknown item type: '{item_type}'")
 
 
+# ---------------------------------------------------------------------------
+# Databricks-Specific Validation
+# ---------------------------------------------------------------------------
+def _validate_databricks(pkg: dict, filename: str, result: ValidationResult):
+    """Validate Databricks-specific business rules."""
+    db_config = pkg["platforms"]["databricks"]
+
+    # Rule DB-1: SCIM group identity is required
+    identity = db_config.get("identity", {})
+    if not identity.get("scim_group"):
+        result.error(filename, "Databricks packages require identity.scim_group "
+                               "for account-level SCIM provisioning")
+
+    # Rule DB-2: workspace-access entitlement required if workspace_acls declared
+    entitlements = db_config.get("entitlements", [])
+    workspace_acls = db_config.get("workspace_acls", [])
+    if workspace_acls and "workspace-access" not in entitlements:
+        result.error(filename, "Databricks packages with workspace_acls must include "
+                               "'workspace-access' entitlement")
+
+    # Rule DB-3: databricks-sql-access required if SQLWarehouse ACL declared
+    has_sql_warehouse = any(
+        acl.get("object_type") == "SQLWarehouse" for acl in workspace_acls
+    )
+    if has_sql_warehouse and "databricks-sql-access" not in entitlements:
+        result.error(filename, "Databricks packages with SQLWarehouse ACLs must include "
+                               "'databricks-sql-access' entitlement")
+
+    # Rule DB-4: Unity Catalog prerequisite chain enforcement
+    uc_config = db_config.get("unity_catalog", {})
+    uc_grants = uc_config.get("grants", [])
+    _validate_uc_prerequisite_chain(uc_grants, filename, result)
+
+    # Rule DB-5: No DENY in Unity Catalog (positive-permission-only)
+    # This is enforced by the schema (no deny[] field), but check for
+    # any grant statements that contain DENY as a string pattern
+    for grant in uc_grants:
+        for priv in grant.get("privileges", []):
+            if "DENY" in priv.upper():
+                result.error(filename, f"Unity Catalog does not support DENY. "
+                                       f"Found '{priv}' on {grant.get('securable_name')}. "
+                                       f"Use REVOKE or omit the grant instead.")
+
+
+def _validate_uc_prerequisite_chain(uc_grants: list[dict], filename: str,
+                                     result: ValidationResult):
+    """
+    Validate that Unity Catalog grants have the required prerequisite chain.
+
+    UC requires USE_CATALOG on the catalog and USE_SCHEMA on the schema
+    before any object-level privilege takes effect. This rule ensures
+    that access packages declare the full chain explicitly.
+    """
+    # Build sets of what's granted
+    catalog_use = set()      # catalogs with USE_CATALOG
+    schema_use = set()       # schemas with USE_SCHEMA (as "catalog.schema")
+
+    for grant in uc_grants:
+        securable_type = grant.get("securable_type", "")
+        securable_name = grant.get("securable_name", "")
+        privileges = grant.get("privileges", [])
+
+        if securable_type == "Catalog" and "USE_CATALOG" in privileges:
+            catalog_use.add(securable_name)
+
+        if securable_type == "Schema" and "USE_SCHEMA" in privileges:
+            schema_use.add(securable_name)
+
+    # Check that every schema-level grant has a corresponding USE_CATALOG
+    for grant in uc_grants:
+        securable_type = grant.get("securable_type", "")
+        securable_name = grant.get("securable_name", "")
+        privileges = grant.get("privileges", [])
+
+        # Skip catalog-level and metastore-level securables
+        if securable_type in ("Catalog", "ExternalLocation", "StorageCredential", "Connection"):
+            continue
+
+        parts = securable_name.split(".")
+        if len(parts) < 2:
+            continue
+
+        catalog_name = parts[0]
+        schema_full_name = f"{parts[0]}.{parts[1]}"
+
+        # Check USE_CATALOG prerequisite
+        if catalog_name not in catalog_use:
+            result.error(
+                filename,
+                f"UC prerequisite missing: grant on {securable_type} "
+                f"'{securable_name}' requires USE_CATALOG on '{catalog_name}' "
+                f"(not declared in this package)"
+            )
+
+        # Check USE_SCHEMA prerequisite for object-level grants
+        # (Tables, Views, Volumes, Functions, Models — anything below schema level)
+        if securable_type not in ("Schema",):
+            if schema_full_name not in schema_use:
+                result.error(
+                    filename,
+                    f"UC prerequisite missing: grant on {securable_type} "
+                    f"'{securable_name}' requires USE_SCHEMA on "
+                    f"'{schema_full_name}' (not declared in this package)"
+                )
+
+
+# ---------------------------------------------------------------------------
+# Cross-Package Validation
+# ---------------------------------------------------------------------------
 def _validate_cross_package(packages: dict, result: ValidationResult):
     """Validate rules that span multiple packages."""
     # Rule: No two packages should use the same Entra group
+    # UNLESS one is Fabric-only and the other is Databricks-only
+    # (same Entra group can grant access to both platforms)
     group_to_packages = {}
     for filename, pkg in packages.items():
         group = pkg.get("package", {}).get("entra_group", "")
+        has_databricks = "databricks" in pkg.get("platforms", {})
+        has_fabric_grants = bool(pkg.get("grants", {}).get("items"))
+        platform_key = "databricks" if (has_databricks and not has_fabric_grants) else "fabric"
         if group:
-            group_to_packages.setdefault(group, []).append(filename)
+            group_to_packages.setdefault(group, []).append((filename, platform_key))
 
-    for group, files in group_to_packages.items():
-        if len(files) > 1:
-            result.error(
-                "cross-package",
-                f"Entra group '{group}' is used by multiple packages: {', '.join(files)}. "
-                f"Each access package must have a unique security group."
-            )
+    for group, entries in group_to_packages.items():
+        # Group entries by platform
+        platforms_seen = {}
+        for filename, platform in entries:
+            platforms_seen.setdefault(platform, []).append(filename)
+
+        # Error if same group + same platform in multiple packages
+        for platform, files in platforms_seen.items():
+            if len(files) > 1:
+                result.error(
+                    "cross-package",
+                    f"Entra group '{group}' is used by multiple {platform} packages: "
+                    f"{', '.join(files)}. Each access package must have a unique "
+                    f"security group per platform."
+                )
 
 
 # ---------------------------------------------------------------------------
