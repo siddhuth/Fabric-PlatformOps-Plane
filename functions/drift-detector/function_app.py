@@ -1,12 +1,16 @@
 """
 drift-detector — Scheduled Azure Function that compares declared access
-package state (YAML configs) against actual Fabric permissions.
+package state (YAML configs) against actual platform permissions.
 
 Runs on a configurable schedule (default: daily) and produces a drift
 report identifying:
   - Users with access not declared in any package (shadow access)
-  - Declared permissions that are missing in Fabric (under-provisioned)
+  - Declared permissions that are missing in the platform (under-provisioned)
   - Permission levels that exceed what the package declares (over-provisioned)
+
+Supports multi-platform drift detection via the provider registry:
+  - Fabric: workspace roles, item permissions
+  - Databricks: Unity Catalog grants, workspace ACLs
 
 The drift report is:
   1. Logged to Azure Monitor / Log Analytics
@@ -25,7 +29,7 @@ import azure.functions as func
 
 import sys
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'shared'))
-from fabric_client import FabricClient
+from provider_registry import get_provider, DriftFinding
 
 logger = logging.getLogger(__name__)
 
@@ -36,25 +40,12 @@ ACCESS_PACKAGES_DIR = os.environ.get(
 
 
 @dataclass
-class DriftItem:
-    """A single drift finding."""
-    category: str       # "shadow_access" | "under_provisioned" | "over_provisioned"
-    severity: str       # "high" | "medium" | "low"
-    workspace: str
-    item: str
-    principal: str
-    declared: str       # What the config says
-    actual: str         # What Fabric reports
-    package: str        # Which access package this relates to
-
-
-@dataclass
 class DriftReport:
     """Complete drift report for a scan run."""
     timestamp: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
     total_packages_scanned: int = 0
-    total_workspaces_scanned: int = 0
-    findings: list[DriftItem] = field(default_factory=list)
+    platforms_scanned: list[str] = field(default_factory=list)
+    findings: list[DriftFinding] = field(default_factory=list)
     errors: list[str] = field(default_factory=list)
 
     @property
@@ -69,20 +60,21 @@ class DriftReport:
         return {
             "timestamp": self.timestamp,
             "total_packages_scanned": self.total_packages_scanned,
-            "total_workspaces_scanned": self.total_workspaces_scanned,
+            "platforms_scanned": self.platforms_scanned,
             "has_drift": self.has_drift,
             "summary": {
                 "total_findings": len(self.findings),
                 "high": self.high_severity_count,
                 "medium": sum(1 for f in self.findings if f.severity == "medium"),
                 "low": sum(1 for f in self.findings if f.severity == "low"),
+                "by_platform": self._findings_by_platform(),
             },
             "findings": [
                 {
+                    "platform": f.platform,
                     "category": f.category,
                     "severity": f.severity,
-                    "workspace": f.workspace,
-                    "item": f.item,
+                    "securable": f.securable,
                     "principal": f.principal,
                     "declared": f.declared,
                     "actual": f.actual,
@@ -92,6 +84,12 @@ class DriftReport:
             ],
             "errors": self.errors,
         }
+
+    def _findings_by_platform(self) -> dict:
+        counts = {}
+        for f in self.findings:
+            counts[f.platform] = counts.get(f.platform, 0) + 1
+        return counts
 
 
 # ---------------------------------------------------------------------------
@@ -133,108 +131,45 @@ def drift_detector_manual(req: func.HttpRequest) -> func.HttpResponse:
 # ---------------------------------------------------------------------------
 def run_drift_scan() -> DriftReport:
     """
-    Execute a full drift scan across all access packages.
+    Execute a full drift scan across all access packages and platforms.
 
-    For each access package:
-      1. Load the YAML definition (desired state)
-      2. Query Fabric APIs for actual workspace roles and item permissions
-      3. Compare and identify discrepancies
+    For each platform referenced in any package:
+      1. Load all YAML definitions (desired state)
+      2. Get the platform provider (real or mock)
+      3. Call detect_drift() which queries actual platform state
+      4. Aggregate findings into a unified report
     """
     report = DriftReport()
-    client = FabricClient.from_environment()
 
     # Load all access packages
     packages = _load_all_packages()
     report.total_packages_scanned = len(packages)
 
-    # Build a map of expected group → permissions
-    expected_state = {}
+    # Determine which platforms are referenced
+    platforms_needed = set()
     for pkg_name, pkg in packages.items():
-        group_name = pkg.get("package", {}).get("entra_group", "")
-        ws_ref = pkg.get("grants", {}).get("workspace", {}).get("id", "")
-        ws_role = pkg.get("grants", {}).get("workspace", {}).get("role", "")
-        workspace_id = _resolve_env(ws_ref)
+        grants = pkg.get("grants", {})
+        if grants.get("items") or grants.get("compute"):
+            platforms_needed.add("fabric")
+        for platform_name in pkg.get("platforms", {}):
+            platforms_needed.add(platform_name)
 
-        if workspace_id:
-            key = (workspace_id, group_name)
-            expected_state[key] = {
-                "package": pkg_name,
-                "role": ws_role,
-                "items": pkg.get("grants", {}).get("items", []),
-            }
+    # Run drift detection per platform
+    for platform_name in sorted(platforms_needed):
+        logger.info(f"Running drift detection for platform: {platform_name}")
+        try:
+            provider = get_provider(platform_name)
+            findings = provider.detect_drift(packages)
+            report.findings.extend(findings)
+            report.platforms_scanned.append(platform_name)
+            logger.info(f"{platform_name}: {len(findings)} drift findings")
+        except NotImplementedError as e:
+            logger.warning(f"Skipping {platform_name}: {e}")
+        except Exception as e:
+            report.errors.append(f"Drift detection failed for {platform_name}: {str(e)}")
+            logger.error(f"Drift detection failed for {platform_name}: {e}")
 
-    # Query actual workspace state
-    scanned_workspaces = set()
-    try:
-        workspaces = client.list_workspaces()
-        for ws in workspaces:
-            ws_id = ws["id"]
-            ws_name = ws.get("displayName", ws_id)
-            scanned_workspaces.add(ws_id)
-
-            # Check workspace role assignments
-            _check_workspace_roles(client, ws_id, ws_name, expected_state, report)
-
-    except Exception as e:
-        report.errors.append(f"Failed to list workspaces: {str(e)}")
-        logger.error(f"Workspace listing failed: {e}")
-
-    report.total_workspaces_scanned = len(scanned_workspaces)
     return report
-
-
-def _check_workspace_roles(client: FabricClient, workspace_id: str,
-                           workspace_name: str, expected_state: dict,
-                           report: DriftReport):
-    """
-    Compare expected workspace roles against actual for a given workspace.
-    """
-    try:
-        # Use PBI API to get workspace users
-        import requests
-        resp = requests.get(
-            f"https://api.powerbi.com/v1.0/myorg/groups/{workspace_id}/users",
-            headers={"Authorization": f"Bearer {client.pbi_token}"},
-            timeout=30,
-        )
-        if resp.status_code != 200:
-            report.errors.append(f"Failed to get users for workspace {workspace_name}")
-            return
-
-        actual_users = resp.json().get("value", [])
-        actual_by_id = {u["identifier"]: u for u in actual_users}
-
-        # Check for under-provisioning
-        for (ws_id, group_name), expected in expected_state.items():
-            if ws_id != workspace_id:
-                continue
-
-            # We can't directly resolve group membership here, but we can
-            # verify the group itself has the expected role
-            for user in actual_users:
-                if (user.get("identifier") == group_name or
-                        user.get("displayName") == group_name):
-                    actual_role = user.get("groupUserAccessRight", "")
-                    if actual_role != expected["role"]:
-                        report.findings.append(DriftItem(
-                            category="over_provisioned" if _role_rank(actual_role) > _role_rank(expected["role"]) else "under_provisioned",
-                            severity="high" if _role_rank(actual_role) > _role_rank(expected["role"]) else "medium",
-                            workspace=workspace_name,
-                            item="workspace-role",
-                            principal=group_name,
-                            declared=expected["role"],
-                            actual=actual_role,
-                            package=expected["package"],
-                        ))
-
-    except Exception as e:
-        report.errors.append(f"Role check failed for {workspace_name}: {str(e)}")
-
-
-def _role_rank(role: str) -> int:
-    """Rank workspace roles for comparison (higher = more privileged)."""
-    ranks = {"Viewer": 1, "Contributor": 2, "Member": 3, "Admin": 4}
-    return ranks.get(role, 0)
 
 
 # ---------------------------------------------------------------------------
@@ -262,13 +197,6 @@ def _load_all_packages() -> dict:
     return packages
 
 
-def _resolve_env(ref: str) -> str:
-    """Resolve ${ENV_VAR} references."""
-    if ref.startswith("${") and ref.endswith("}"):
-        return os.environ.get(ref[2:-1], "")
-    return ref
-
-
 def _publish_report(report: DriftReport):
     """Publish drift report to Log Analytics and storage."""
     report_dict = report.to_dict()
@@ -277,5 +205,6 @@ def _publish_report(report: DriftReport):
     if report.has_drift:
         logger.warning(
             f"DRIFT DETECTED: {len(report.findings)} findings "
-            f"({report.high_severity_count} high severity)"
+            f"({report.high_severity_count} high severity) "
+            f"across platforms: {', '.join(report.platforms_scanned)}"
         )

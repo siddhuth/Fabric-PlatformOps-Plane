@@ -3,15 +3,11 @@ revoke-access — Azure Function triggered when a user is removed from
 an access package security group (expiration, manual removal, or
 recertification failure).
 
-Mirrors the provision-access function but executes revocation:
-  1. Removes workspace role
-  2. Logs item permission revocations for manual follow-up
-  3. Executes T-SQL REVOKE statements
-  4. Logs audit events
-
-Note: Item-level permission revocation via API is limited in Fabric.
-The function logs these for platform team manual action via the
-control plane UI.
+Dispatches revocation to the appropriate platform providers (Fabric,
+Databricks, or both) via the provider registry. Each provider handles
+its own revocation layers:
+  - Fabric: workspace role removal, item revocation logging, SQL REVOKE
+  - Databricks: UC REVOKE, workspace ACL removal, entitlement removal
 """
 
 import os
@@ -22,8 +18,7 @@ from datetime import datetime, timezone
 
 import sys
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'shared'))
-from fabric_client import FabricClient, ProvisioningResult
-from sql_grants import revoke_sql_access
+from provider_registry import get_all_providers, ProvisioningResult
 
 logger = logging.getLogger(__name__)
 
@@ -69,61 +64,24 @@ async def revoke_access(req: func.HttpRequest) -> func.HttpResponse:
     if not package:
         return func.HttpResponse(f"No access package for group: {group_name}", status_code=404)
 
-    client = FabricClient.from_environment()
-    results = []
-    grants = package.get("grants", {})
+    # Get all platform providers and dispatch revocation
+    providers = get_all_providers(package)
+    results: list[ProvisioningResult] = []
 
-    # --- Revoke workspace role ---
-    ws_config = grants.get("workspace", {})
-    workspace_id = _resolve_env(ws_config.get("id", ""))
-    if workspace_id:
-        result = client.remove_workspace_role(workspace_id, user_id)
-        results.append(result)
-        logger.info(f"Workspace role removal: {result.detail}")
-
-    # --- Log item permission revocations ---
-    for item_config in grants.get("items", []):
-        item_name = item_config.get("name", "unknown")
-        results.append(ProvisioningResult(
-            layer="item", target=item_name,
-            action="revoke_item_logged", success=True,
-            detail=f"Item permission revocation queued for manual review ({item_name})",
-            principal_id=user_id,
-        ))
-        logger.warning(f"MANUAL ACTION REQUIRED: Revoke item permissions for "
-                       f"{user_email} on {item_name}")
-
-    # --- Revoke SQL grants ---
-    sql_config = grants.get("compute", {}).get("sql_endpoint", {})
-    if sql_config.get("grants") or sql_config.get("deny"):
+    for provider in providers:
+        logger.info(f"Dispatching revoke to {provider.platform_name} provider")
         try:
-            sql_results = revoke_sql_access(
-                access_package=package,
-                variables={
-                    "ENTRA_GROUP_SID": package["package"]["entra_group"],
-                    "PRINCIPAL_NAME": user_email,
-                },
-                server=os.environ.get("FABRIC_SQL_SERVER", ""),
-                database=os.environ.get("FABRIC_SQL_DATABASE", ""),
-                tenant_id=os.environ["AZURE_TENANT_ID"],
-                client_id=os.environ["FABRIC_CLIENT_ID"],
-                client_secret=os.environ["FABRIC_CLIENT_SECRET"],
-            )
-            for sr in sql_results:
-                results.append(ProvisioningResult(
-                    layer="compute", target=sr.script.description,
-                    action="sql_revoke", success=sr.success,
-                    detail=sr.error or "OK", principal_id=user_id,
-                ))
+            results.extend(provider.revoke(package, user_id, user_email))
         except Exception as e:
-            logger.error(f"SQL revocation failed: {e}")
+            logger.error(f"Provider {provider.platform_name} revocation failed: {e}")
             results.append(ProvisioningResult(
-                layer="compute", target="sql_endpoint",
-                action="sql_revoke", success=False,
+                platform=provider.platform_name, layer="dispatch",
+                target="provider", action="revoke", success=False,
                 detail=str(e), principal_id=user_id,
             ))
 
     # Build audit entry
+    platforms_involved = list({r.platform for r in results})
     audit_entry = {
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "action": "revoke",
@@ -131,6 +89,7 @@ async def revoke_access(req: func.HttpRequest) -> func.HttpResponse:
         "user": user_email,
         "group": group_name,
         "package": package.get("package", {}).get("name", "unknown"),
+        "platforms": platforms_involved,
         "results_summary": {
             "total": len(results),
             "succeeded": sum(1 for r in results if r.success),
@@ -143,7 +102,11 @@ async def revoke_access(req: func.HttpRequest) -> func.HttpResponse:
     return func.HttpResponse(
         json.dumps({
             "status": "complete" if all_success else "partial",
-            "results": [{"layer": r.layer, "target": r.target, "success": r.success, "detail": r.detail} for r in results],
+            "results": [
+                {"platform": r.platform, "layer": r.layer, "target": r.target,
+                 "success": r.success, "detail": r.detail}
+                for r in results
+            ],
             "audit": audit_entry,
         }),
         status_code=200 if all_success else 207,
@@ -163,9 +126,3 @@ def _load_package_for_group(group_name):
         if pkg and pkg.get("package", {}).get("entra_group") == group_name:
             return pkg
     return None
-
-
-def _resolve_env(ref):
-    if ref.startswith("${") and ref.endswith("}"):
-        return os.environ.get(ref[2:-1], "")
-    return ref
