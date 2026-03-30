@@ -38,6 +38,7 @@ grants:
       name: sales-mirror-db-sqle
       permissions:
         - Read
+      additional_permissions:
         - ReadAllSql  # Read all SQL endpoint data
 
   compute:
