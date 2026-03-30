@@ -1,8 +1,8 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://fabric-access-platform/schemas/access-package.schema.json",
-  "title": "Fabric Access Package Definition",
-  "description": "Schema for validating persona-based access package YAML definitions.",
+  "title": "Multi-Platform Access Package Definition",
+  "description": "Schema for validating persona-based access package YAML definitions across Fabric, Databricks, and Snowflake.",
   "type": "object",
   "required": ["package", "grants"],
   "properties": {
@@ -132,6 +132,172 @@
           }
         }
       }
+    },
+    "platforms": {
+      "type": "object",
+      "description": "Multi-platform permission grants beyond Fabric.",
+      "properties": {
+        "databricks": {
+          "type": "object",
+          "description": "Azure Databricks workspace and Unity Catalog permissions.",
+          "properties": {
+            "identity": {
+              "type": "object",
+              "description": "SCIM identity configuration for Databricks account-level sync.",
+              "required": ["scim_group"],
+              "properties": {
+                "scim_group": {
+                  "type": "string",
+                  "description": "Account-level Databricks group name (synced from Entra via SCIM)."
+                }
+              }
+            },
+            "entitlements": {
+              "type": "array",
+              "description": "Workspace-level entitlements assigned via SCIM.",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "workspace-access",
+                  "databricks-sql-access",
+                  "allow-cluster-create",
+                  "allow-instance-pool-create"
+                ]
+              }
+            },
+            "unity_catalog": {
+              "type": "object",
+              "description": "Unity Catalog GRANT-style permissions. No DENY supported (positive-permission-only).",
+              "properties": {
+                "grants": {
+                  "type": "array",
+                  "description": "Unity Catalog privilege grants. Each entry specifies a securable and its privileges.",
+                  "items": {
+                    "type": "object",
+                    "required": ["securable_type", "securable_name", "privileges"],
+                    "properties": {
+                      "securable_type": {
+                        "type": "string",
+                        "enum": [
+                          "Catalog", "Schema", "Table", "View",
+                          "MaterializedView", "Volume", "Function",
+                          "RegisteredModel", "ExternalLocation",
+                          "StorageCredential", "Connection"
+                        ]
+                      },
+                      "securable_name": {
+                        "type": "string",
+                        "description": "Fully qualified name (e.g., 'catalog.schema.table')."
+                      },
+                      "privileges": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "enum": [
+                            "USE_CATALOG", "USE_SCHEMA",
+                            "SELECT", "MODIFY",
+                            "CREATE_TABLE", "CREATE_VIEW",
+                            "CREATE_VOLUME", "CREATE_FUNCTION",
+                            "CREATE_MODEL", "CREATE_SCHEMA",
+                            "CREATE_MATERIALIZED_VIEW",
+                            "ALL_PRIVILEGES",
+                            "EXECUTE",
+                            "READ_VOLUME", "WRITE_VOLUME",
+                            "APPLY_MODEL", "APPLY_TAG", "BROWSE",
+                            "READ_FILES", "WRITE_FILES",
+                            "CREATE_EXTERNAL_TABLE",
+                            "CREATE_EXTERNAL_LOCATION",
+                            "CREATE_EXTERNAL_VOLUME",
+                            "CREATE_MANAGED_STORAGE",
+                            "USE_CONNECTION",
+                            "CREATE_FOREIGN_CATALOG",
+                            "CREATE_STORAGE_CREDENTIAL"
+                          ]
+                        },
+                        "minItems": 1
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "workspace_acls": {
+              "type": "array",
+              "description": "Workspace-level ACL grants on compute, code, and workflow objects.",
+              "items": {
+                "type": "object",
+                "required": ["object_type", "object_ref", "permission_level"],
+                "properties": {
+                  "object_type": {
+                    "type": "string",
+                    "enum": [
+                      "Cluster", "ClusterPolicy", "SQLWarehouse",
+                      "Job", "DLTPipeline", "Notebook", "Repo",
+                      "Directory", "ServingEndpoint",
+                      "VectorSearchEndpoint", "GenieSpace",
+                      "AIBIDashboard", "DatabricksApp",
+                      "Experiment", "SecretScope", "InstancePool"
+                    ]
+                  },
+                  "object_ref": {
+                    "type": "string",
+                    "description": "Object name or ${ENV_VAR} reference to object ID."
+                  },
+                  "permission_level": {
+                    "type": "string",
+                    "enum": [
+                      "CAN_ATTACH_TO", "CAN_RESTART", "CAN_MANAGE",
+                      "CAN_USE", "CAN_MONITOR",
+                      "CAN_VIEW", "CAN_MANAGE_RUN",
+                      "CAN_READ", "CAN_RUN", "CAN_EDIT",
+                      "CAN_QUERY",
+                      "IS_OWNER",
+                      "READ", "WRITE", "MANAGE"
+                    ]
+                  }
+                }
+              }
+            },
+            "compute_policy": {
+              "type": "object",
+              "description": "Cluster policy and SQL warehouse assignments.",
+              "properties": {
+                "cluster_policy": {
+                  "type": ["string", "null"],
+                  "description": "Cluster policy name the group gets CAN_USE on."
+                },
+                "sql_warehouse": {
+                  "type": ["string", "null"],
+                  "description": "SQL warehouse name the group gets CAN_USE on."
+                },
+                "instance_pool": {
+                  "type": ["string", "null"],
+                  "description": "Instance pool name the group gets CAN_ATTACH_TO on."
+                }
+              }
+            }
+          }
+        },
+        "snowflake": {
+          "type": "object",
+          "description": "Snowflake permissions (Phase 3 — not yet supported).",
+          "properties": {
+            "account": {
+              "type": "object",
+              "properties": {
+                "locator": { "type": "string" },
+                "role": { "type": "string" },
+                "warehouse": { "type": "string" }
+              }
+            },
+            "grants": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          }
+        }
+      },
+      "additionalProperties": false
     },
     "metadata": {
       "type": "object",

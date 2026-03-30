@@ -1,0 +1,105 @@
+# access-packages/definitions/databricks-engineer.yaml
+#
+# Access package for the Data Engineer persona on Azure Databricks.
+# Grants workspace access, Unity Catalog privileges on the sales domain
+# staging and curated schemas, and compute access via cluster policy
+# and SQL warehouse.
+
+package:
+  name: databricks-engineer-sales
+  version: "1.0"
+  entra_group: sg-fabric-de-sales
+  approval_policy: manager-plus-platform
+  expiration_days: 180
+  description: >
+    Data engineers working on the sales domain in Databricks.
+    Full read/write access to staging schemas via Unity Catalog,
+    read access to curated schemas, cluster policy for ETL workloads,
+    and SQL warehouse access for interactive queries.
+
+grants:
+  workspace:
+    id: ${DATABRICKS_WORKSPACE_ID}
+    role: Contributor
+
+platforms:
+  databricks:
+    identity:
+      scim_group: sg-fabric-de-sales
+
+    entitlements:
+      - workspace-access
+      - databricks-sql-access
+
+    unity_catalog:
+      grants:
+        # Catalog-level access path
+        - securable_type: Catalog
+          securable_name: sales_catalog
+          privileges:
+            - USE_CATALOG
+
+        # Staging schema — full read/write for ETL
+        - securable_type: Schema
+          securable_name: sales_catalog.staging
+          privileges:
+            - USE_SCHEMA
+            - SELECT
+            - MODIFY
+            - CREATE_TABLE
+            - CREATE_VIEW
+
+        # Curated schema — read-only consumption
+        - securable_type: Schema
+          securable_name: sales_catalog.curated
+          privileges:
+            - USE_SCHEMA
+            - SELECT
+
+        # Raw schema — read-only for source data inspection
+        - securable_type: Schema
+          securable_name: sales_catalog.raw
+          privileges:
+            - USE_SCHEMA
+            - SELECT
+
+        # Volumes — read/write for file-based staging
+        - securable_type: Volume
+          securable_name: sales_catalog.staging.etl_files
+          privileges:
+            - READ_VOLUME
+            - WRITE_VOLUME
+
+        # External location — read source data from ADLS
+        - securable_type: ExternalLocation
+          securable_name: adls-sales-raw
+          privileges:
+            - READ_FILES
+
+    workspace_acls:
+      - object_type: ClusterPolicy
+        object_ref: ${DE_CLUSTER_POLICY_ID}
+        permission_level: CAN_USE
+
+      - object_type: SQLWarehouse
+        object_ref: ${SALES_SQL_WAREHOUSE_ID}
+        permission_level: CAN_USE
+
+      - object_type: Notebook
+        object_ref: ${DE_NOTEBOOKS_DIR_ID}
+        permission_level: CAN_EDIT
+
+      - object_type: Repo
+        object_ref: ${SALES_ETL_REPO_ID}
+        permission_level: CAN_EDIT
+
+    compute_policy:
+      cluster_policy: de-standard-policy
+      sql_warehouse: sales-sql-warehouse
+
+metadata:
+  owner: platform-team
+  domain: sales
+  sensitivity: confidential
+  last_reviewed: "2026-03-15"
+  review_cadence_days: 90
