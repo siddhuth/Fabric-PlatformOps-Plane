@@ -1,0 +1,434 @@
+{
+  "generated_at": "2026-04-01T00:00:00+00:00",
+  "total_traces": 4,
+  "traces_by_status": {
+    "success": 3,
+    "partial": 1,
+    "failed": 0
+  },
+  "traces": [
+    {
+      "trace_id": "TRC-001",
+      "timestamp": "2026-03-28T14:32:10+00:00",
+      "user": {
+        "id": "u-001",
+        "email": "alex.chen@contoso.com",
+        "name": "Alex Chen",
+        "title": "Senior Data Engineer"
+      },
+      "package": "data-engineer-sales-lakehouse",
+      "group": "sg-fabric-de-sales",
+      "trigger": "entra-governance:group-add",
+      "platforms": [
+        "fabric"
+      ],
+      "duration_ms": 3420,
+      "status": "success",
+      "steps": [
+        {
+          "seq": 1,
+          "ts": "2026-03-28T14:32:10+00:00",
+          "platform": "fabric",
+          "layer": "workspace",
+          "action": "assign_role",
+          "target": "sales-lakehouse",
+          "detail": "Assigned Contributor role",
+          "status": "success",
+          "duration_ms": 820
+        },
+        {
+          "seq": 2,
+          "ts": "2026-03-28T14:32:10.820000+00:00",
+          "platform": "fabric",
+          "layer": "item",
+          "action": "share_item",
+          "target": "SalesMirroredDB",
+          "detail": "Shared with Read, ReadAll, ReadAllApacheSpark",
+          "status": "success",
+          "duration_ms": 650
+        },
+        {
+          "seq": 3,
+          "ts": "2026-03-28T14:32:11.470000+00:00",
+          "platform": "fabric",
+          "layer": "item",
+          "action": "share_item",
+          "target": "SalesSemanticModel",
+          "detail": "Shared with Read",
+          "status": "success",
+          "duration_ms": 580
+        },
+        {
+          "seq": 4,
+          "ts": "2026-03-28T14:32:12.050000+00:00",
+          "platform": "fabric",
+          "layer": "item",
+          "action": "share_item",
+          "target": "SalesSQLEndpoint",
+          "detail": "Shared with Read, ReadAllSql",
+          "status": "success",
+          "duration_ms": 520
+        },
+        {
+          "seq": 5,
+          "ts": "2026-03-28T14:32:12.570000+00:00",
+          "platform": "fabric",
+          "layer": "compute",
+          "action": "sql_grant",
+          "target": "staging schema",
+          "detail": "GRANT SELECT, INSERT, CREATE TABLE ON SCHEMA::staging",
+          "status": "success",
+          "duration_ms": 450
+        },
+        {
+          "seq": 6,
+          "ts": "2026-03-28T14:32:13.020000+00:00",
+          "platform": "fabric",
+          "layer": "compute",
+          "action": "sql_deny",
+          "target": "curated schema",
+          "detail": "DENY DELETE ON SCHEMA::curated",
+          "status": "success",
+          "duration_ms": 400
+        }
+      ]
+    },
+    {
+      "trace_id": "TRC-002",
+      "timestamp": "2026-03-30T09:15:00+00:00",
+      "user": {
+        "id": "u-001",
+        "email": "alex.chen@contoso.com",
+        "name": "Alex Chen",
+        "title": "Senior Data Engineer"
+      },
+      "package": "databricks-engineer-sales",
+      "group": "sg-fabric-de-sales",
+      "trigger": "entra-governance:group-add",
+      "platforms": [
+        "fabric",
+        "databricks"
+      ],
+      "duration_ms": 5840,
+      "status": "success",
+      "steps": [
+        {
+          "seq": 1,
+          "ts": "2026-03-30T09:15:00+00:00",
+          "platform": "fabric",
+          "layer": "workspace",
+          "action": "assign_role",
+          "target": "sales-lakehouse",
+          "detail": "Assigned Contributor role",
+          "status": "success",
+          "duration_ms": 780
+        },
+        {
+          "seq": 2,
+          "ts": "2026-03-30T09:15:00.780000+00:00",
+          "platform": "databricks",
+          "layer": "entitlements",
+          "action": "set_entitlements",
+          "target": "sg-fabric-de-sales",
+          "detail": "Set workspace-access, databricks-sql-access",
+          "status": "success",
+          "duration_ms": 620
+        },
+        {
+          "seq": 3,
+          "ts": "2026-03-30T09:15:01.400000+00:00",
+          "platform": "databricks",
+          "layer": "unity_catalog",
+          "action": "grant",
+          "target": "sales_catalog",
+          "detail": "GRANT USE_CATALOG ON CATALOG sales_catalog",
+          "status": "success",
+          "duration_ms": 540
+        },
+        {
+          "seq": 4,
+          "ts": "2026-03-30T09:15:01.940000+00:00",
+          "platform": "databricks",
+          "layer": "unity_catalog",
+          "action": "grant",
+          "target": "sales_catalog.staging",
+          "detail": "GRANT USE_SCHEMA, SELECT, INSERT, CREATE_TABLE ON SCHEMA staging",
+          "status": "success",
+          "duration_ms": 680
+        },
+        {
+          "seq": 5,
+          "ts": "2026-03-30T09:15:02.620000+00:00",
+          "platform": "databricks",
+          "layer": "unity_catalog",
+          "action": "grant",
+          "target": "sales_catalog.curated",
+          "detail": "GRANT USE_SCHEMA, SELECT ON SCHEMA curated",
+          "status": "success",
+          "duration_ms": 520
+        },
+        {
+          "seq": 6,
+          "ts": "2026-03-30T09:15:03.140000+00:00",
+          "platform": "databricks",
+          "layer": "unity_catalog",
+          "action": "grant",
+          "target": "sales_catalog.raw",
+          "detail": "GRANT USE_SCHEMA, SELECT ON SCHEMA raw",
+          "status": "success",
+          "duration_ms": 490
+        },
+        {
+          "seq": 7,
+          "ts": "2026-03-30T09:15:03.630000+00:00",
+          "platform": "databricks",
+          "layer": "workspace_acl",
+          "action": "set_permission",
+          "target": "ClusterPolicy/de-standard-policy",
+          "detail": "Set CAN_USE",
+          "status": "success",
+          "duration_ms": 580
+        },
+        {
+          "seq": 8,
+          "ts": "2026-03-30T09:15:04.210000+00:00",
+          "platform": "databricks",
+          "layer": "workspace_acl",
+          "action": "set_permission",
+          "target": "SQLWarehouse/sales-sql-warehouse",
+          "detail": "Set CAN_USE",
+          "status": "success",
+          "duration_ms": 520
+        },
+        {
+          "seq": 9,
+          "ts": "2026-03-30T09:15:04.730000+00:00",
+          "platform": "databricks",
+          "layer": "workspace_acl",
+          "action": "set_permission",
+          "target": "Notebook/etl-pipelines/",
+          "detail": "Set CAN_EDIT",
+          "status": "success",
+          "duration_ms": 560
+        },
+        {
+          "seq": 10,
+          "ts": "2026-03-30T09:15:05.290000+00:00",
+          "platform": "databricks",
+          "layer": "workspace_acl",
+          "action": "set_permission",
+          "target": "Repo/sales-repo",
+          "detail": "Set CAN_EDIT",
+          "status": "success",
+          "duration_ms": 550
+        }
+      ]
+    },
+    {
+      "trace_id": "TRC-003",
+      "timestamp": "2026-03-31T11:45:00+00:00",
+      "user": {
+        "id": "u-004",
+        "email": "priya.sharma@contoso.com",
+        "name": "Priya Sharma",
+        "title": "ML Engineer"
+      },
+      "package": "databricks-ml-team-sales",
+      "group": "sg-fabric-ml-sales",
+      "trigger": "entra-governance:group-add",
+      "platforms": [
+        "fabric",
+        "databricks"
+      ],
+      "duration_ms": 7120,
+      "status": "success",
+      "steps": [
+        {
+          "seq": 1,
+          "ts": "2026-03-31T11:45:00+00:00",
+          "platform": "fabric",
+          "layer": "workspace",
+          "action": "assign_role",
+          "target": "sales-lakehouse",
+          "detail": "Assigned Contributor role",
+          "status": "success",
+          "duration_ms": 810
+        },
+        {
+          "seq": 2,
+          "ts": "2026-03-31T11:45:00.810000+00:00",
+          "platform": "databricks",
+          "layer": "entitlements",
+          "action": "set_entitlements",
+          "target": "sg-fabric-ml-sales",
+          "detail": "Set workspace-access, databricks-sql-access, allow-cluster-create",
+          "status": "success",
+          "duration_ms": 650
+        },
+        {
+          "seq": 3,
+          "ts": "2026-03-31T11:45:01.460000+00:00",
+          "platform": "databricks",
+          "layer": "unity_catalog",
+          "action": "grant",
+          "target": "sales_catalog.curated",
+          "detail": "GRANT USE_SCHEMA, SELECT ON SCHEMA curated",
+          "status": "success",
+          "duration_ms": 580
+        },
+        {
+          "seq": 4,
+          "ts": "2026-03-31T11:45:02.040000+00:00",
+          "platform": "databricks",
+          "layer": "unity_catalog",
+          "action": "grant",
+          "target": "ml_catalog",
+          "detail": "GRANT USE_CATALOG ON CATALOG ml_catalog",
+          "status": "success",
+          "duration_ms": 520
+        },
+        {
+          "seq": 5,
+          "ts": "2026-03-31T11:45:02.560000+00:00",
+          "platform": "databricks",
+          "layer": "unity_catalog",
+          "action": "grant",
+          "target": "ml_catalog.models",
+          "detail": "GRANT USE_SCHEMA, CREATE_MODEL, SELECT ON SCHEMA models",
+          "status": "success",
+          "duration_ms": 610
+        },
+        {
+          "seq": 6,
+          "ts": "2026-03-31T11:45:03.170000+00:00",
+          "platform": "databricks",
+          "layer": "unity_catalog",
+          "action": "grant",
+          "target": "ml_catalog.features",
+          "detail": "GRANT USE_SCHEMA, CREATE_TABLE, CREATE_FUNCTION, SELECT ON SCHEMA features",
+          "status": "success",
+          "duration_ms": 590
+        },
+        {
+          "seq": 7,
+          "ts": "2026-03-31T11:45:03.760000+00:00",
+          "platform": "databricks",
+          "layer": "workspace_acl",
+          "action": "set_permission",
+          "target": "ServingEndpoint/sales-serving",
+          "detail": "Set CAN_MANAGE",
+          "status": "success",
+          "duration_ms": 680
+        },
+        {
+          "seq": 8,
+          "ts": "2026-03-31T11:45:04.440000+00:00",
+          "platform": "databricks",
+          "layer": "workspace_acl",
+          "action": "set_permission",
+          "target": "DLTPipeline/feature-pipeline",
+          "detail": "Set CAN_RUN",
+          "status": "success",
+          "duration_ms": 620
+        },
+        {
+          "seq": 9,
+          "ts": "2026-03-31T11:45:05.060000+00:00",
+          "platform": "databricks",
+          "layer": "workspace_acl",
+          "action": "set_permission",
+          "target": "Job/ml-training-daily",
+          "detail": "Set CAN_MANAGE_RUN",
+          "status": "success",
+          "duration_ms": 580
+        },
+        {
+          "seq": 10,
+          "ts": "2026-03-31T11:45:05.640000+00:00",
+          "platform": "databricks",
+          "layer": "workspace_acl",
+          "action": "set_permission",
+          "target": "Experiment/sales-forecasting",
+          "detail": "Set CAN_EDIT",
+          "status": "success",
+          "duration_ms": 540
+        },
+        {
+          "seq": 11,
+          "ts": "2026-03-31T11:45:06.180000+00:00",
+          "platform": "databricks",
+          "layer": "workspace_acl",
+          "action": "set_permission",
+          "target": "Notebook/ml-notebooks/",
+          "detail": "Set CAN_EDIT",
+          "status": "success",
+          "duration_ms": 480
+        },
+        {
+          "seq": 12,
+          "ts": "2026-03-31T11:45:06.660000+00:00",
+          "platform": "databricks",
+          "layer": "workspace_acl",
+          "action": "set_permission",
+          "target": "Repo/ml-repo",
+          "detail": "Set CAN_EDIT",
+          "status": "success",
+          "duration_ms": 460
+        }
+      ]
+    },
+    {
+      "trace_id": "TRC-004",
+      "timestamp": "2026-03-29T16:20:00+00:00",
+      "user": {
+        "id": "u-008",
+        "email": "sarah.johnson@contoso.com",
+        "name": "Sarah Johnson",
+        "title": "Data Analyst"
+      },
+      "package": "analytics-team-sales",
+      "group": "sg-fabric-analytics-sales",
+      "trigger": "entra-governance:access-expiration",
+      "platforms": [
+        "fabric"
+      ],
+      "duration_ms": 2180,
+      "status": "partial",
+      "steps": [
+        {
+          "seq": 1,
+          "ts": "2026-03-29T16:20:00+00:00",
+          "platform": "fabric",
+          "layer": "workspace",
+          "action": "remove_role",
+          "target": "sales-analytics",
+          "detail": "Removed Viewer role",
+          "status": "success",
+          "duration_ms": 720
+        },
+        {
+          "seq": 2,
+          "ts": "2026-03-29T16:20:00.720000+00:00",
+          "platform": "fabric",
+          "layer": "item",
+          "action": "revoke_item",
+          "target": "SalesMirroredDB",
+          "detail": "Item revocation queued for manual review",
+          "status": "success",
+          "duration_ms": 380
+        },
+        {
+          "seq": 3,
+          "ts": "2026-03-29T16:20:01.100000+00:00",
+          "platform": "fabric",
+          "layer": "compute",
+          "action": "sql_revoke",
+          "target": "analytics schema",
+          "detail": "REVOKE SELECT ON SCHEMA::analytics \u2014 connection timeout",
+          "status": "failed",
+          "duration_ms": 1080
+        }
+      ]
+    }
+  ]
+}

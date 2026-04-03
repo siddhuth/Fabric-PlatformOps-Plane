@@ -1,0 +1,138 @@
+{
+  "generated_at": "2026-04-01T00:00:00+00:00",
+  "scan_timestamp": "2026-04-01T06:00:00+00:00",
+  "total_findings": 9,
+  "summary": {
+    "high": 4,
+    "medium": 4,
+    "low": 1,
+    "by_platform": {
+      "fabric": 4,
+      "databricks": 5
+    },
+    "by_category": {
+      "shadow_access": 4,
+      "over_provisioned": 3,
+      "under_provisioned": 2
+    }
+  },
+  "findings": [
+    {
+      "id": "DRF-001",
+      "platform": "fabric",
+      "category": "shadow_access",
+      "severity": "high",
+      "securable": "workspace:ws-a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "principal": "extern-contractor@partner.com",
+      "declared": "\u2014",
+      "actual": "Contributor",
+      "package": "\u2014",
+      "detail": "User has Contributor role but is not in any access package group",
+      "detected_at": "2026-03-31T16:45:56+00:00"
+    },
+    {
+      "id": "DRF-002",
+      "platform": "fabric",
+      "category": "over_provisioned",
+      "severity": "high",
+      "securable": "workspace:ws-a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "principal": "sg-fabric-analytics-sales",
+      "declared": "Viewer",
+      "actual": "Member",
+      "package": "analytics-team-sales",
+      "detail": "Group has Member role but package declares Viewer",
+      "detected_at": "2026-03-30T23:22:25+00:00"
+    },
+    {
+      "id": "DRF-003",
+      "platform": "fabric",
+      "category": "under_provisioned",
+      "severity": "medium",
+      "securable": "item:SalesSemanticModel",
+      "principal": "sg-fabric-do-sales",
+      "declared": "Read",
+      "actual": "\u2014",
+      "package": "data-office-sales-viewer",
+      "detail": "Declared item sharing not found \u2014 may need re-provisioning",
+      "detected_at": "2026-03-31T05:46:00+00:00"
+    },
+    {
+      "id": "DRF-004",
+      "platform": "databricks",
+      "category": "shadow_access",
+      "severity": "high",
+      "securable": "catalog:sales_catalog.staging",
+      "principal": "temp-intern-group",
+      "declared": "\u2014",
+      "actual": "SELECT, INSERT",
+      "package": "\u2014",
+      "detail": "Undeclared group has write access to staging schema",
+      "detected_at": "2026-03-31T01:19:57+00:00"
+    },
+    {
+      "id": "DRF-005",
+      "platform": "databricks",
+      "category": "over_provisioned",
+      "severity": "high",
+      "securable": "catalog:sales_catalog.curated",
+      "principal": "sg-fabric-de-sales",
+      "declared": "SELECT",
+      "actual": "SELECT, INSERT, MODIFY",
+      "package": "databricks-engineer-sales",
+      "detail": "Group has write privileges on curated but package only declares SELECT",
+      "detected_at": "2026-03-31T21:02:58+00:00"
+    },
+    {
+      "id": "DRF-006",
+      "platform": "databricks",
+      "category": "under_provisioned",
+      "severity": "medium",
+      "securable": "catalog:ml_catalog.models",
+      "principal": "sg-fabric-ml-sales",
+      "declared": "CREATE_MODEL, SELECT",
+      "actual": "SELECT",
+      "package": "databricks-ml-team-sales",
+      "detail": "CREATE_MODEL privilege missing \u2014 may need re-grant",
+      "detected_at": "2026-03-30T21:27:45+00:00"
+    },
+    {
+      "id": "DRF-007",
+      "platform": "databricks",
+      "category": "shadow_access",
+      "severity": "medium",
+      "securable": "workspace_acl:SQLWarehouse/sales-sql-warehouse",
+      "principal": "data-platform-admins",
+      "declared": "\u2014",
+      "actual": "CAN_MANAGE",
+      "package": "\u2014",
+      "detail": "Admin group has CAN_MANAGE on warehouse but not in any package",
+      "detected_at": "2026-03-30T02:28:47+00:00"
+    },
+    {
+      "id": "DRF-008",
+      "platform": "databricks",
+      "category": "over_provisioned",
+      "severity": "medium",
+      "securable": "workspace_acl:Notebook/etl-pipelines/",
+      "principal": "sg-fabric-ml-sales",
+      "declared": "CAN_RUN",
+      "actual": "CAN_MANAGE",
+      "package": "databricks-ml-team-sales",
+      "detail": "Group has CAN_MANAGE but package only grants CAN_RUN",
+      "detected_at": "2026-03-31T00:00:04+00:00"
+    },
+    {
+      "id": "DRF-009",
+      "platform": "fabric",
+      "category": "shadow_access",
+      "severity": "low",
+      "securable": "sql_endpoint:SELECT on dbo.legacy_reports",
+      "principal": "sg-fabric-analytics-sales",
+      "declared": "\u2014",
+      "actual": "SELECT",
+      "package": "\u2014",
+      "detail": "SQL grant exists on legacy table not in any package definition",
+      "detected_at": "2026-03-30T16:09:30+00:00"
+    }
+  ]
+}

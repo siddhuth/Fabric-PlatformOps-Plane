@@ -1,0 +1,80 @@
+{
+  "generated_at": "2026-04-01T00:00:00+00:00",
+  "platforms": [
+    {
+      "name": "Microsoft Fabric",
+      "id": "fabric",
+      "status": "active",
+      "version": "GA",
+      "icon": "fabric",
+      "stats": {
+        "access_packages": 6,
+        "active_users": 8,
+        "workspaces_managed": 2,
+        "items_shared": 12,
+        "sql_grants_active": 18,
+        "last_provision": "2026-03-31T14:32:10Z",
+        "last_drift_scan": "2026-04-01T06:00:00Z",
+        "drift_findings": 4
+      },
+      "capabilities": [
+        "Workspace role assignment",
+        "Item-level sharing (Read, Build, Reshare)",
+        "SQL analytics endpoint GRANT/DENY",
+        "OneLake security roles",
+        "Row-level & object-level security"
+      ]
+    },
+    {
+      "name": "Azure Databricks",
+      "id": "databricks",
+      "status": "active",
+      "version": "Unity Catalog",
+      "icon": "databricks",
+      "stats": {
+        "access_packages": 2,
+        "active_users": 4,
+        "catalogs_managed": 2,
+        "uc_grants_active": 24,
+        "workspace_acls_active": 16,
+        "scim_groups_synced": 3,
+        "last_provision": "2026-03-31T11:45:00Z",
+        "last_drift_scan": "2026-04-01T06:00:00Z",
+        "drift_findings": 5
+      },
+      "capabilities": [
+        "Unity Catalog grants (CATALOG, SCHEMA, TABLE, VIEW, VOLUME, MODEL, FUNCTION)",
+        "Workspace ACLs (16 object types)",
+        "SCIM entitlements (workspace-access, sql-access, cluster-create, instance-pool)",
+        "Compute policy assignment",
+        "System table drift detection"
+      ]
+    },
+    {
+      "name": "Snowflake",
+      "id": "snowflake",
+      "status": "coming_soon",
+      "version": "\u2014",
+      "icon": "snowflake",
+      "stats": {
+        "access_packages": 0,
+        "active_users": 0
+      },
+      "capabilities": [
+        "Database/schema/table GRANT/REVOKE",
+        "Role hierarchy management",
+        "Warehouse access control",
+        "Row access policies",
+        "Dynamic data masking"
+      ],
+      "eta": "Phase 3 \u2014 Q3 2026"
+    }
+  ],
+  "totals": {
+    "platforms_active": 2,
+    "platforms_planned": 1,
+    "total_access_packages": 6,
+    "total_active_users": 8,
+    "total_entra_groups": 5
+  }
+}

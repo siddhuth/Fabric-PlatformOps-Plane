@@ -1,0 +1,969 @@
+{
+  "generated_at": "2026-04-01T00:00:00+00:00",
+  "system_tables": {
+    "information_schema.table_privileges": {
+      "description": "Unity Catalog table-level privilege assignments",
+      "row_count": 19,
+      "sample_rows": [
+        {
+          "catalog_name": "sales_catalog",
+          "schema_name": "staging",
+          "table_name": "*",
+          "grantee": "sg-fabric-de-sales",
+          "privilege_type": "SELECT",
+          "is_grantable": "NO",
+          "inherited_from": "SCHEMA `sales_catalog`.`staging`"
+        },
+        {
+          "catalog_name": "sales_catalog",
+          "schema_name": "staging",
+          "table_name": "*",
+          "grantee": "sg-fabric-de-sales",
+          "privilege_type": "INSERT",
+          "is_grantable": "NO",
+          "inherited_from": "SCHEMA `sales_catalog`.`staging`"
+        },
+        {
+          "catalog_name": "sales_catalog",
+          "schema_name": "staging",
+          "table_name": "*",
+          "grantee": "sg-fabric-de-sales",
+          "privilege_type": "CREATE_TABLE",
+          "is_grantable": "NO",
+          "inherited_from": "SCHEMA `sales_catalog`.`staging`"
+        },
+        {
+          "catalog_name": "sales_catalog",
+          "schema_name": "staging",
+          "table_name": "*",
+          "grantee": "sg-fabric-de-sales",
+          "privilege_type": "MODIFY",
+          "is_grantable": "NO",
+          "inherited_from": "SCHEMA `sales_catalog`.`staging`"
+        },
+        {
+          "catalog_name": "sales_catalog",
+          "schema_name": "staging",
+          "table_name": "*",
+          "grantee": "sg-fabric-ml-sales",
+          "privilege_type": "SELECT",
+          "is_grantable": "NO",
+          "inherited_from": "SCHEMA `sales_catalog`.`staging`"
+        },
+        {
+          "catalog_name": "sales_catalog",
+          "schema_name": "staging",
+          "table_name": "*",
+          "grantee": "sg-fabric-analytics-sales",
+          "privilege_type": "SELECT",
+          "is_grantable": "NO",
+          "inherited_from": "SCHEMA `sales_catalog`.`staging`"
+        },
+        {
+          "catalog_name": "sales_catalog",
+          "schema_name": "curated",
+          "table_name": "*",
+          "grantee": "sg-fabric-de-sales",
+          "privilege_type": "SELECT",
+          "is_grantable": "NO",
+          "inherited_from": "SCHEMA `sales_catalog`.`curated`"
+        },
+        {
+          "catalog_name": "sales_catalog",
+          "schema_name": "curated",
+          "table_name": "*",
+          "grantee": "sg-fabric-ml-sales",
+          "privilege_type": "SELECT",
+          "is_grantable": "NO",
+          "inherited_from": "SCHEMA `sales_catalog`.`curated`"
+        },
+        {
+          "catalog_name": "sales_catalog",
+          "schema_name": "curated",
+          "table_name": "*",
+          "grantee": "sg-fabric-analytics-sales",
+          "privilege_type": "SELECT",
+          "is_grantable": "NO",
+          "inherited_from": "SCHEMA `sales_catalog`.`curated`"
+        },
+        {
+          "catalog_name": "sales_catalog",
+          "schema_name": "raw",
+          "table_name": "*",
+          "grantee": "sg-fabric-de-sales",
+          "privilege_type": "SELECT",
+          "is_grantable": "NO",
+          "inherited_from": "SCHEMA `sales_catalog`.`raw`"
+        },
+        {
+          "catalog_name": "sales_catalog",
+          "schema_name": "raw",
+          "table_name": "*",
+          "grantee": "sg-fabric-ml-sales",
+          "privilege_type": "SELECT",
+          "is_grantable": "NO",
+          "inherited_from": "SCHEMA `sales_catalog`.`raw`"
+        },
+        {
+          "catalog_name": "sales_catalog",
+          "schema_name": "raw",
+          "table_name": "*",
+          "grantee": "sg-fabric-analytics-sales",
+          "privilege_type": "SELECT",
+          "is_grantable": "NO",
+          "inherited_from": "SCHEMA `sales_catalog`.`raw`"
+        },
+        {
+          "catalog_name": "ml_catalog",
+          "schema_name": "models",
+          "table_name": "*",
+          "grantee": "sg-fabric-ml-sales",
+          "privilege_type": "SELECT",
+          "is_grantable": "NO",
+          "inherited_from": "SCHEMA `ml_catalog`.`models`"
+        },
+        {
+          "catalog_name": "ml_catalog",
+          "schema_name": "models",
+          "table_name": "*",
+          "grantee": "sg-fabric-ml-sales",
+          "privilege_type": "CREATE_MODEL",
+          "is_grantable": "NO",
+          "inherited_from": "SCHEMA `ml_catalog`.`models`"
+        },
+        {
+          "catalog_name": "ml_catalog",
+          "schema_name": "features",
+          "table_name": "*",
+          "grantee": "sg-fabric-ml-sales",
+          "privilege_type": "SELECT",
+          "is_grantable": "NO",
+          "inherited_from": "SCHEMA `ml_catalog`.`features`"
+        },
+        {
+          "catalog_name": "ml_catalog",
+          "schema_name": "features",
+          "table_name": "*",
+          "grantee": "sg-fabric-ml-sales",
+          "privilege_type": "CREATE_TABLE",
+          "is_grantable": "NO",
+          "inherited_from": "SCHEMA `ml_catalog`.`features`"
+        },
+        {
+          "catalog_name": "ml_catalog",
+          "schema_name": "features",
+          "table_name": "*",
+          "grantee": "sg-fabric-ml-sales",
+          "privilege_type": "CREATE_FUNCTION",
+          "is_grantable": "NO",
+          "inherited_from": "SCHEMA `ml_catalog`.`features`"
+        },
+        {
+          "catalog_name": "ml_catalog",
+          "schema_name": "serving",
+          "table_name": "*",
+          "grantee": "sg-fabric-ml-sales",
+          "privilege_type": "SELECT",
+          "is_grantable": "NO",
+          "inherited_from": "SCHEMA `ml_catalog`.`serving`"
+        },
+        {
+          "catalog_name": "ml_catalog",
+          "schema_name": "serving",
+          "table_name": "*",
+          "grantee": "sg-fabric-ml-sales",
+          "privilege_type": "CREATE_FUNCTION",
+          "is_grantable": "NO",
+          "inherited_from": "SCHEMA `ml_catalog`.`serving`"
+        }
+      ]
+    },
+    "access.audit": {
+      "description": "Databricks audit log events (last 24h sample)",
+      "row_count": 25,
+      "sample_rows": [
+        {
+          "event_time": "2026-03-31T23:03:00+00:00",
+          "event_date": "2026-03-31",
+          "service_name": "databrickssql",
+          "action_name": "executeStatement",
+          "user_identity": {
+            "email": "priya.sharma@contoso.com"
+          },
+          "request_params": {
+            "catalog_name": "sales_catalog"
+          },
+          "response": {
+            "status_code": 200
+          },
+          "source_ip_address": "10.0.1.104",
+          "workspace_id": "1234567890123456"
+        },
+        {
+          "event_time": "2026-03-31T19:13:00+00:00",
+          "event_date": "2026-03-31",
+          "service_name": "unityCatalog",
+          "action_name": "getPermissions",
+          "user_identity": {
+            "email": "james.wilson@contoso.com"
+          },
+          "request_params": {
+            "catalog_name": "ml_catalog"
+          },
+          "response": {
+            "status_code": 200
+          },
+          "source_ip_address": "10.0.4.176",
+          "workspace_id": "1234567890123456"
+        },
+        {
+          "event_time": "2026-03-31T18:38:00+00:00",
+          "event_date": "2026-03-31",
+          "service_name": "unityCatalog",
+          "action_name": "generateTemporaryTableCredential",
+          "user_identity": {
+            "email": "alex.chen@contoso.com"
+          },
+          "request_params": {
+            "catalog_name": "sales_catalog"
+          },
+          "response": {
+            "status_code": 200
+          },
+          "source_ip_address": "10.0.10.21",
+          "workspace_id": "1234567890123456"
+        },
+        {
+          "event_time": "2026-03-31T17:45:00+00:00",
+          "event_date": "2026-03-31",
+          "service_name": "databrickssql",
+          "action_name": "executeStatement",
+          "user_identity": {
+            "email": "maria.garcia@contoso.com"
+          },
+          "request_params": {
+            "catalog_name": "ml_catalog"
+          },
+          "response": {
+            "status_code": 200
+          },
+          "source_ip_address": "10.0.10.252",
+          "workspace_id": "1234567890123456"
+        },
+        {
+          "event_time": "2026-03-31T17:06:00+00:00",
+          "event_date": "2026-03-31",
+          "service_name": "databrickssql",
+          "action_name": "executeStatement",
+          "user_identity": {
+            "email": "alex.chen@contoso.com"
+          },
+          "request_params": {
+            "catalog_name": "sales_catalog"
+          },
+          "response": {
+            "status_code": 200
+          },
+          "source_ip_address": "10.0.9.215",
+          "workspace_id": "1234567890123456"
+        },
+        {
+          "event_time": "2026-03-31T16:58:00+00:00",
+          "event_date": "2026-03-31",
+          "service_name": "databrickssql",
+          "action_name": "executeStatement",
+          "user_identity": {
+            "email": "omar.hassan@contoso.com"
+          },
+          "request_params": {
+            "catalog_name": "sales_catalog"
+          },
+          "response": {
+            "status_code": 200
+          },
+          "source_ip_address": "10.0.1.246",
+          "workspace_id": "1234567890123456"
+        },
+        {
+          "event_time": "2026-03-31T16:31:00+00:00",
+          "event_date": "2026-03-31",
+          "service_name": "unityCatalog",
+          "action_name": "getPermissions",
+          "user_identity": {
+            "email": "lisa.tanaka@contoso.com"
+          },
+          "request_params": {
+            "catalog_name": "ml_catalog"
+          },
+          "response": {
+            "status_code": 200
+          },
+          "source_ip_address": "10.0.1.24",
+          "workspace_id": "1234567890123456"
+        },
+        {
+          "event_time": "2026-03-31T14:20:00+00:00",
+          "event_date": "2026-03-31",
+          "service_name": "unityCatalog",
+          "action_name": "getPermissions",
+          "user_identity": {
+            "email": "lisa.tanaka@contoso.com"
+          },
+          "request_params": {
+            "catalog_name": "sales_catalog"
+          },
+          "response": {
+            "status_code": 200
+          },
+          "source_ip_address": "10.0.1.118",
+          "workspace_id": "1234567890123456"
+        },
+        {
+          "event_time": "2026-03-31T14:18:00+00:00",
+          "event_date": "2026-03-31",
+          "service_name": "unityCatalog",
+          "action_name": "getPermissions",
+          "user_identity": {
+            "email": "priya.sharma@contoso.com"
+          },
+          "request_params": {
+            "catalog_name": "ml_catalog"
+          },
+          "response": {
+            "status_code": 200
+          },
+          "source_ip_address": "10.0.9.170",
+          "workspace_id": "1234567890123456"
+        },
+        {
+          "event_time": "2026-03-31T13:11:00+00:00",
+          "event_date": "2026-03-31",
+          "service_name": "unityCatalog",
+          "action_name": "createTable",
+          "user_identity": {
+            "email": "priya.sharma@contoso.com"
+          },
+          "request_params": {
+            "catalog_name": "ml_catalog"
+          },
+          "response": {
+            "status_code": 200
+          },
+          "source_ip_address": "10.0.8.64",
+          "workspace_id": "1234567890123456"
+        },
+        {
+          "event_time": "2026-03-31T10:59:00+00:00",
+          "event_date": "2026-03-31",
+          "service_name": "clusters",
+          "action_name": "clusterPolicyAccess",
+          "user_identity": {
+            "email": "priya.sharma@contoso.com"
+          },
+          "request_params": {
+            "catalog_name": "ml_catalog"
+          },
+          "response": {
+            "status_code": 200
+          },
+          "source_ip_address": "10.0.4.172",
+          "workspace_id": "1234567890123456"
+        },
+        {
+          "event_time": "2026-03-31T08:02:00+00:00",
+          "event_date": "2026-03-31",
+          "service_name": "databrickssql",
+          "action_name": "getWarehouse",
+          "user_identity": {
+            "email": "lisa.tanaka@contoso.com"
+          },
+          "request_params": {
+            "catalog_name": "sales_catalog"
+          },
+          "response": {
+            "status_code": 200
+          },
+          "source_ip_address": "10.0.6.198",
+          "workspace_id": "1234567890123456"
+        },
+        {
+          "event_time": "2026-03-31T07:16:00+00:00",
+          "event_date": "2026-03-31",
+          "service_name": "unityCatalog",
+          "action_name": "updatePermissions",
+          "user_identity": {
+            "email": "lisa.tanaka@contoso.com"
+          },
+          "request_params": {
+            "catalog_name": "ml_catalog"
+          },
+          "response": {
+            "status_code": 200
+          },
+          "source_ip_address": "10.0.3.172",
+          "workspace_id": "1234567890123456"
+        },
+        {
+          "event_time": "2026-03-31T07:10:00+00:00",
+          "event_date": "2026-03-31",
+          "service_name": "unityCatalog",
+          "action_name": "getSchema",
+          "user_identity": {
+            "email": "alex.chen@contoso.com"
+          },
+          "request_params": {
+            "catalog_name": "ml_catalog"
+          },
+          "response": {
+            "status_code": 200
+          },
+          "source_ip_address": "10.0.8.124",
+          "workspace_id": "1234567890123456"
+        },
+        {
+          "event_time": "2026-03-31T05:47:00+00:00",
+          "event_date": "2026-03-31",
+          "service_name": "unityCatalog",
+          "action_name": "getPermissions",
+          "user_identity": {
+            "email": "maria.garcia@contoso.com"
+          },
+          "request_params": {
+            "catalog_name": "ml_catalog"
+          },
+          "response": {
+            "status_code": 200
+          },
+          "source_ip_address": "10.0.9.181",
+          "workspace_id": "1234567890123456"
+        },
+        {
+          "event_time": "2026-03-31T05:04:00+00:00",
+          "event_date": "2026-03-31",
+          "service_name": "unityCatalog",
+          "action_name": "getSchema",
+          "user_identity": {
+            "email": "omar.hassan@contoso.com"
+          },
+          "request_params": {
+            "catalog_name": "sales_catalog"
+          },
+          "response": {
+            "status_code": 200
+          },
+          "source_ip_address": "10.0.4.104",
+          "workspace_id": "1234567890123456"
+        },
+        {
+          "event_time": "2026-03-31T04:12:00+00:00",
+          "event_date": "2026-03-31",
+          "service_name": "databrickssql",
+          "action_name": "executeStatement",
+          "user_identity": {
+            "email": "lisa.tanaka@contoso.com"
+          },
+          "request_params": {
+            "catalog_name": "ml_catalog"
+          },
+          "response": {
+            "status_code": 200
+          },
+          "source_ip_address": "10.0.4.248",
+          "workspace_id": "1234567890123456"
+        },
+        {
+          "event_time": "2026-03-31T03:56:00+00:00",
+          "event_date": "2026-03-31",
+          "service_name": "unityCatalog",
+          "action_name": "getPermissions",
+          "user_identity": {
+            "email": "maria.garcia@contoso.com"
+          },
+          "request_params": {
+            "catalog_name": "sales_catalog"
+          },
+          "response": {
+            "status_code": 200
+          },
+          "source_ip_address": "10.0.9.40",
+          "workspace_id": "1234567890123456"
+        },
+        {
+          "event_time": "2026-03-31T03:15:00+00:00",
+          "event_date": "2026-03-31",
+          "service_name": "unityCatalog",
+          "action_name": "updatePermissions",
+          "user_identity": {
+            "email": "lisa.tanaka@contoso.com"
+          },
+          "request_params": {
+            "catalog_name": "sales_catalog"
+          },
+          "response": {
+            "status_code": 200
+          },
+          "source_ip_address": "10.0.4.138",
+          "workspace_id": "1234567890123456"
+        },
+        {
+          "event_time": "2026-03-31T03:06:00+00:00",
+          "event_date": "2026-03-31",
+          "service_name": "unityCatalog",
+          "action_name": "generateTemporaryTableCredential",
+          "user_identity": {
+            "email": "priya.sharma@contoso.com"
+          },
+          "request_params": {
+            "catalog_name": "ml_catalog"
+          },
+          "response": {
+            "status_code": 200
+          },
+          "source_ip_address": "10.0.6.109",
+          "workspace_id": "1234567890123456"
+        },
+        {
+          "event_time": "2026-03-31T02:56:00+00:00",
+          "event_date": "2026-03-31",
+          "service_name": "unityCatalog",
+          "action_name": "updatePermissions",
+          "user_identity": {
+            "email": "maria.garcia@contoso.com"
+          },
+          "request_params": {
+            "catalog_name": "sales_catalog"
+          },
+          "response": {
+            "status_code": 200
+          },
+          "source_ip_address": "10.0.6.73",
+          "workspace_id": "1234567890123456"
+        },
+        {
+          "event_time": "2026-03-31T02:34:00+00:00",
+          "event_date": "2026-03-31",
+          "service_name": "unityCatalog",
+          "action_name": "getSchema",
+          "user_identity": {
+            "email": "omar.hassan@contoso.com"
+          },
+          "request_params": {
+            "catalog_name": "sales_catalog"
+          },
+          "response": {
+            "status_code": 200
+          },
+          "source_ip_address": "10.0.9.68",
+          "workspace_id": "1234567890123456"
+        },
+        {
+          "event_time": "2026-03-31T01:47:00+00:00",
+          "event_date": "2026-03-31",
+          "service_name": "clusters",
+          "action_name": "clusterPolicyAccess",
+          "user_identity": {
+            "email": "alex.chen@contoso.com"
+          },
+          "request_params": {
+            "catalog_name": "ml_catalog"
+          },
+          "response": {
+            "status_code": 200
+          },
+          "source_ip_address": "10.0.1.13",
+          "workspace_id": "1234567890123456"
+        },
+        {
+          "event_time": "2026-03-31T01:10:00+00:00",
+          "event_date": "2026-03-31",
+          "service_name": "databrickssql",
+          "action_name": "getWarehouse",
+          "user_identity": {
+            "email": "maria.garcia@contoso.com"
+          },
+          "request_params": {
+            "catalog_name": "ml_catalog"
+          },
+          "response": {
+            "status_code": 200
+          },
+          "source_ip_address": "10.0.1.253",
+          "workspace_id": "1234567890123456"
+        },
+        {
+          "event_time": "2026-03-31T00:42:00+00:00",
+          "event_date": "2026-03-31",
+          "service_name": "clusters",
+          "action_name": "clusterPolicyAccess",
+          "user_identity": {
+            "email": "lisa.tanaka@contoso.com"
+          },
+          "request_params": {
+            "catalog_name": "ml_catalog"
+          },
+          "response": {
+            "status_code": 200
+          },
+          "source_ip_address": "10.0.2.241",
+          "workspace_id": "1234567890123456"
+        }
+      ]
+    },
+    "billing.usage": {
+      "description": "Databricks DBU consumption (7-day window)",
+      "row_count": 35,
+      "sample_rows": [
+        {
+          "usage_date": "2026-03-25",
+          "workspace_id": "1234567890123456",
+          "sku_name": "STANDARD_ALL_PURPOSE_COMPUTE",
+          "usage_quantity": 37.08,
+          "usage_unit": "DBU",
+          "estimated_cost_usd": 14.83,
+          "billing_origin_product": "DEFAULT",
+          "usage_type": "INTERACTIVE"
+        },
+        {
+          "usage_date": "2026-03-25",
+          "workspace_id": "1234567890123456",
+          "sku_name": "STANDARD_SQL_COMPUTE",
+          "usage_quantity": 5.73,
+          "usage_unit": "DBU",
+          "estimated_cost_usd": 1.26,
+          "billing_origin_product": "DATABRICKS_SQL",
+          "usage_type": "AUTOMATED"
+        },
+        {
+          "usage_date": "2026-03-25",
+          "workspace_id": "1234567890123456",
+          "sku_name": "STANDARD_SERVERLESS_SQL_COMPUTE",
+          "usage_quantity": 10.64,
+          "usage_unit": "DBU",
+          "estimated_cost_usd": 3.72,
+          "billing_origin_product": "DATABRICKS_SQL",
+          "usage_type": "AUTOMATED"
+        },
+        {
+          "usage_date": "2026-03-25",
+          "workspace_id": "1234567890123456",
+          "sku_name": "STANDARD_JOBS_COMPUTE",
+          "usage_quantity": 71.23,
+          "usage_unit": "DBU",
+          "estimated_cost_usd": 10.68,
+          "billing_origin_product": "DEFAULT",
+          "usage_type": "AUTOMATED"
+        },
+        {
+          "usage_date": "2026-03-25",
+          "workspace_id": "1234567890123456",
+          "sku_name": "STANDARD_ML_COMPUTE",
+          "usage_quantity": 72.79,
+          "usage_unit": "DBU",
+          "estimated_cost_usd": 47.31,
+          "billing_origin_product": "DEFAULT",
+          "usage_type": "AUTOMATED"
+        },
+        {
+          "usage_date": "2026-03-26",
+          "workspace_id": "1234567890123456",
+          "sku_name": "STANDARD_ALL_PURPOSE_COMPUTE",
+          "usage_quantity": 45.92,
+          "usage_unit": "DBU",
+          "estimated_cost_usd": 18.37,
+          "billing_origin_product": "DEFAULT",
+          "usage_type": "INTERACTIVE"
+        },
+        {
+          "usage_date": "2026-03-26",
+          "workspace_id": "1234567890123456",
+          "sku_name": "STANDARD_SQL_COMPUTE",
+          "usage_quantity": 67.59,
+          "usage_unit": "DBU",
+          "estimated_cost_usd": 14.87,
+          "billing_origin_product": "DATABRICKS_SQL",
+          "usage_type": "AUTOMATED"
+        },
+        {
+          "usage_date": "2026-03-26",
+          "workspace_id": "1234567890123456",
+          "sku_name": "STANDARD_SERVERLESS_SQL_COMPUTE",
+          "usage_quantity": 48.69,
+          "usage_unit": "DBU",
+          "estimated_cost_usd": 17.04,
+          "billing_origin_product": "DATABRICKS_SQL",
+          "usage_type": "AUTOMATED"
+        },
+        {
+          "usage_date": "2026-03-26",
+          "workspace_id": "1234567890123456",
+          "sku_name": "STANDARD_JOBS_COMPUTE",
+          "usage_quantity": 16.11,
+          "usage_unit": "DBU",
+          "estimated_cost_usd": 2.42,
+          "billing_origin_product": "DEFAULT",
+          "usage_type": "AUTOMATED"
+        },
+        {
+          "usage_date": "2026-03-26",
+          "workspace_id": "1234567890123456",
+          "sku_name": "STANDARD_ML_COMPUTE",
+          "usage_quantity": 14.56,
+          "usage_unit": "DBU",
+          "estimated_cost_usd": 9.46,
+          "billing_origin_product": "DEFAULT",
+          "usage_type": "AUTOMATED"
+        },
+        {
+          "usage_date": "2026-03-27",
+          "workspace_id": "1234567890123456",
+          "sku_name": "STANDARD_ALL_PURPOSE_COMPUTE",
+          "usage_quantity": 28.12,
+          "usage_unit": "DBU",
+          "estimated_cost_usd": 11.25,
+          "billing_origin_product": "DEFAULT",
+          "usage_type": "INTERACTIVE"
+        },
+        {
+          "usage_date": "2026-03-27",
+          "workspace_id": "1234567890123456",
+          "sku_name": "STANDARD_SQL_COMPUTE",
+          "usage_quantity": 72.42,
+          "usage_unit": "DBU",
+          "estimated_cost_usd": 15.93,
+          "billing_origin_product": "DATABRICKS_SQL",
+          "usage_type": "AUTOMATED"
+        },
+        {
+          "usage_date": "2026-03-27",
+          "workspace_id": "1234567890123456",
+          "sku_name": "STANDARD_SERVERLESS_SQL_COMPUTE",
+          "usage_quantity": 64.71,
+          "usage_unit": "DBU",
+          "estimated_cost_usd": 22.65,
+          "billing_origin_product": "DATABRICKS_SQL",
+          "usage_type": "AUTOMATED"
+        },
+        {
+          "usage_date": "2026-03-27",
+          "workspace_id": "1234567890123456",
+          "sku_name": "STANDARD_JOBS_COMPUTE",
+          "usage_quantity": 69.55,
+          "usage_unit": "DBU",
+          "estimated_cost_usd": 10.43,
+          "billing_origin_product": "DEFAULT",
+          "usage_type": "AUTOMATED"
+        },
+        {
+          "usage_date": "2026-03-27",
+          "workspace_id": "1234567890123456",
+          "sku_name": "STANDARD_ML_COMPUTE",
+          "usage_quantity": 72.42,
+          "usage_unit": "DBU",
+          "estimated_cost_usd": 47.07,
+          "billing_origin_product": "DEFAULT",
+          "usage_type": "AUTOMATED"
+        },
+        {
+          "usage_date": "2026-03-28",
+          "workspace_id": "1234567890123456",
+          "sku_name": "STANDARD_ALL_PURPOSE_COMPUTE",
+          "usage_quantity": 20.76,
+          "usage_unit": "DBU",
+          "estimated_cost_usd": 8.3,
+          "billing_origin_product": "DEFAULT",
+          "usage_type": "INTERACTIVE"
+        },
+        {
+          "usage_date": "2026-03-28",
+          "workspace_id": "1234567890123456",
+          "sku_name": "STANDARD_SQL_COMPUTE",
+          "usage_quantity": 23.71,
+          "usage_unit": "DBU",
+          "estimated_cost_usd": 5.22,
+          "billing_origin_product": "DATABRICKS_SQL",
+          "usage_type": "AUTOMATED"
+        },
+        {
+          "usage_date": "2026-03-28",
+          "workspace_id": "1234567890123456",
+          "sku_name": "STANDARD_SERVERLESS_SQL_COMPUTE",
+          "usage_quantity": 12.71,
+          "usage_unit": "DBU",
+          "estimated_cost_usd": 4.45,
+          "billing_origin_product": "DATABRICKS_SQL",
+          "usage_type": "AUTOMATED"
+        },
+        {
+          "usage_date": "2026-03-28",
+          "workspace_id": "1234567890123456",
+          "sku_name": "STANDARD_JOBS_COMPUTE",
+          "usage_quantity": 63.51,
+          "usage_unit": "DBU",
+          "estimated_cost_usd": 9.53,
+          "billing_origin_product": "DEFAULT",
+          "usage_type": "AUTOMATED"
+        },
+        {
+          "usage_date": "2026-03-28",
+          "workspace_id": "1234567890123456",
+          "sku_name": "STANDARD_ML_COMPUTE",
+          "usage_quantity": 71.31,
+          "usage_unit": "DBU",
+          "estimated_cost_usd": 46.35,
+          "billing_origin_product": "DEFAULT",
+          "usage_type": "AUTOMATED"
+        },
+        {
+          "usage_date": "2026-03-29",
+          "workspace_id": "1234567890123456",
+          "sku_name": "STANDARD_ALL_PURPOSE_COMPUTE",
+          "usage_quantity": 35.48,
+          "usage_unit": "DBU",
+          "estimated_cost_usd": 14.19,
+          "billing_origin_product": "DEFAULT",
+          "usage_type": "INTERACTIVE"
+        },
+        {
+          "usage_date": "2026-03-29",
+          "workspace_id": "1234567890123456",
+          "sku_name": "STANDARD_SQL_COMPUTE",
+          "usage_quantity": 51.55,
+          "usage_unit": "DBU",
+          "estimated_cost_usd": 11.34,
+          "billing_origin_product": "DATABRICKS_SQL",
+          "usage_type": "AUTOMATED"
+        },
+        {
+          "usage_date": "2026-03-29",
+          "workspace_id": "1234567890123456",
+          "sku_name": "STANDARD_SERVERLESS_SQL_COMPUTE",
+          "usage_quantity": 16.59,
+          "usage_unit": "DBU",
+          "estimated_cost_usd": 5.81,
+          "billing_origin_product": "DATABRICKS_SQL",
+          "usage_type": "AUTOMATED"
+        },
+        {
+          "usage_date": "2026-03-29",
+          "workspace_id": "1234567890123456",
+          "sku_name": "STANDARD_JOBS_COMPUTE",
+          "usage_quantity": 74.74,
+          "usage_unit": "DBU",
+          "estimated_cost_usd": 11.21,
+          "billing_origin_product": "DEFAULT",
+          "usage_type": "AUTOMATED"
+        },
+        {
+          "usage_date": "2026-03-29",
+          "workspace_id": "1234567890123456",
+          "sku_name": "STANDARD_ML_COMPUTE",
+          "usage_quantity": 69.85,
+          "usage_unit": "DBU",
+          "estimated_cost_usd": 45.4,
+          "billing_origin_product": "DEFAULT",
+          "usage_type": "AUTOMATED"
+        },
+        {
+          "usage_date": "2026-03-30",
+          "workspace_id": "1234567890123456",
+          "sku_name": "STANDARD_ALL_PURPOSE_COMPUTE",
+          "usage_quantity": 78.22,
+          "usage_unit": "DBU",
+          "estimated_cost_usd": 31.29,
+          "billing_origin_product": "DEFAULT",
+          "usage_type": "INTERACTIVE"
+        },
+        {
+          "usage_date": "2026-03-30",
+          "workspace_id": "1234567890123456",
+          "sku_name": "STANDARD_SQL_COMPUTE",
+          "usage_quantity": 65.81,
+          "usage_unit": "DBU",
+          "estimated_cost_usd": 14.48,
+          "billing_origin_product": "DATABRICKS_SQL",
+          "usage_type": "AUTOMATED"
+        },
+        {
+          "usage_date": "2026-03-30",
+          "workspace_id": "1234567890123456",
+          "sku_name": "STANDARD_SERVERLESS_SQL_COMPUTE",
+          "usage_quantity": 71.11,
+          "usage_unit": "DBU",
+          "estimated_cost_usd": 24.89,
+          "billing_origin_product": "DATABRICKS_SQL",
+          "usage_type": "AUTOMATED"
+        },
+        {
+          "usage_date": "2026-03-30",
+          "workspace_id": "1234567890123456",
+          "sku_name": "STANDARD_JOBS_COMPUTE",
+          "usage_quantity": 6.86,
+          "usage_unit": "DBU",
+          "estimated_cost_usd": 1.03,
+          "billing_origin_product": "DEFAULT",
+          "usage_type": "AUTOMATED"
+        },
+        {
+          "usage_date": "2026-03-30",
+          "workspace_id": "1234567890123456",
+          "sku_name": "STANDARD_ML_COMPUTE",
+          "usage_quantity": 60.24,
+          "usage_unit": "DBU",
+          "estimated_cost_usd": 39.16,
+          "billing_origin_product": "DEFAULT",
+          "usage_type": "AUTOMATED"
+        },
+        {
+          "usage_date": "2026-03-31",
+          "workspace_id": "1234567890123456",
+          "sku_name": "STANDARD_ALL_PURPOSE_COMPUTE",
+          "usage_quantity": 29.91,
+          "usage_unit": "DBU",
+          "estimated_cost_usd": 11.96,
+          "billing_origin_product": "DEFAULT",
+          "usage_type": "INTERACTIVE"
+        },
+        {
+          "usage_date": "2026-03-31",
+          "workspace_id": "1234567890123456",
+          "sku_name": "STANDARD_SQL_COMPUTE",
+          "usage_quantity": 74.81,
+          "usage_unit": "DBU",
+          "estimated_cost_usd": 16.46,
+          "billing_origin_product": "DATABRICKS_SQL",
+          "usage_type": "AUTOMATED"
+        },
+        {
+          "usage_date": "2026-03-31",
+          "workspace_id": "1234567890123456",
+          "sku_name": "STANDARD_SERVERLESS_SQL_COMPUTE",
+          "usage_quantity": 65.17,
+          "usage_unit": "DBU",
+          "estimated_cost_usd": 22.81,
+          "billing_origin_product": "DATABRICKS_SQL",
+          "usage_type": "AUTOMATED"
+        },
+        {
+          "usage_date": "2026-03-31",
+          "workspace_id": "1234567890123456",
+          "sku_name": "STANDARD_JOBS_COMPUTE",
+          "usage_quantity": 69.8,
+          "usage_unit": "DBU",
+          "estimated_cost_usd": 10.47,
+          "billing_origin_product": "DEFAULT",
+          "usage_type": "AUTOMATED"
+        },
+        {
+          "usage_date": "2026-03-31",
+          "workspace_id": "1234567890123456",
+          "sku_name": "STANDARD_ML_COMPUTE",
+          "usage_quantity": 65.81,
+          "usage_unit": "DBU",
+          "estimated_cost_usd": 42.78,
+          "billing_origin_product": "DEFAULT",
+          "usage_type": "AUTOMATED"
+        }
+      ]
+    }
+  }
+}
