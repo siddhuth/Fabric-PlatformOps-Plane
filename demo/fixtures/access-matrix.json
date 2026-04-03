@@ -1,0 +1,791 @@
+{
+  "generated_at": "2026-04-01T00:00:00+00:00",
+  "total_entries": 78,
+  "platforms": [
+    "databricks",
+    "fabric"
+  ],
+  "unique_principals": 8,
+  "matrix": [
+    {
+      "principal": "maria.garcia@contoso.com",
+      "principal_type": "User",
+      "platform": "fabric",
+      "resource_type": "workspace",
+      "resource": "${WORKSPACE_SALES_ID}",
+      "permission": "Viewer",
+      "package": "analytics-team-sales",
+      "group": "sg-fabric-analytics-sales"
+    },
+    {
+      "principal": "maria.garcia@contoso.com",
+      "principal_type": "User",
+      "platform": "fabric",
+      "resource_type": "MirroredDatabase",
+      "resource": "sales-mirror-db",
+      "permission": "Read",
+      "package": "analytics-team-sales",
+      "group": "sg-fabric-analytics-sales"
+    },
+    {
+      "principal": "maria.garcia@contoso.com",
+      "principal_type": "User",
+      "platform": "fabric",
+      "resource_type": "SemanticModel",
+      "resource": "sales-default-model",
+      "permission": "Read, Build",
+      "package": "analytics-team-sales",
+      "group": "sg-fabric-analytics-sales"
+    },
+    {
+      "principal": "maria.garcia@contoso.com",
+      "principal_type": "User",
+      "platform": "fabric",
+      "resource_type": "Report",
+      "resource": "sales-executive-dashboard",
+      "permission": "Read, Reshare",
+      "package": "analytics-team-sales",
+      "group": "sg-fabric-analytics-sales"
+    },
+    {
+      "principal": "sarah.johnson@contoso.com",
+      "principal_type": "User",
+      "platform": "fabric",
+      "resource_type": "workspace",
+      "resource": "${WORKSPACE_SALES_ID}",
+      "permission": "Viewer",
+      "package": "analytics-team-sales",
+      "group": "sg-fabric-analytics-sales"
+    },
+    {
+      "principal": "sarah.johnson@contoso.com",
+      "principal_type": "User",
+      "platform": "fabric",
+      "resource_type": "MirroredDatabase",
+      "resource": "sales-mirror-db",
+      "permission": "Read",
+      "package": "analytics-team-sales",
+      "group": "sg-fabric-analytics-sales"
+    },
+    {
+      "principal": "sarah.johnson@contoso.com",
+      "principal_type": "User",
+      "platform": "fabric",
+      "resource_type": "SemanticModel",
+      "resource": "sales-default-model",
+      "permission": "Read, Build",
+      "package": "analytics-team-sales",
+      "group": "sg-fabric-analytics-sales"
+    },
+    {
+      "principal": "sarah.johnson@contoso.com",
+      "principal_type": "User",
+      "platform": "fabric",
+      "resource_type": "Report",
+      "resource": "sales-executive-dashboard",
+      "permission": "Read, Reshare",
+      "package": "analytics-team-sales",
+      "group": "sg-fabric-analytics-sales"
+    },
+    {
+      "principal": "alex.chen@contoso.com",
+      "principal_type": "User",
+      "platform": "fabric",
+      "resource_type": "workspace",
+      "resource": "${WORKSPACE_SALES_ID}",
+      "permission": "Contributor",
+      "package": "data-engineer-sales-lakehouse",
+      "group": "sg-fabric-de-sales"
+    },
+    {
+      "principal": "alex.chen@contoso.com",
+      "principal_type": "User",
+      "platform": "fabric",
+      "resource_type": "MirroredDatabase",
+      "resource": "sales-mirror-db",
+      "permission": "Read, ReadAll",
+      "package": "data-engineer-sales-lakehouse",
+      "group": "sg-fabric-de-sales"
+    },
+    {
+      "principal": "alex.chen@contoso.com",
+      "principal_type": "User",
+      "platform": "fabric",
+      "resource_type": "SemanticModel",
+      "resource": "sales-default-model",
+      "permission": "Read",
+      "package": "data-engineer-sales-lakehouse",
+      "group": "sg-fabric-de-sales"
+    },
+    {
+      "principal": "alex.chen@contoso.com",
+      "principal_type": "User",
+      "platform": "fabric",
+      "resource_type": "SQLEndpoint",
+      "resource": "sales-mirror-db-sqle",
+      "permission": "Read",
+      "package": "data-engineer-sales-lakehouse",
+      "group": "sg-fabric-de-sales"
+    },
+    {
+      "principal": "omar.hassan@contoso.com",
+      "principal_type": "User",
+      "platform": "fabric",
+      "resource_type": "workspace",
+      "resource": "${WORKSPACE_SALES_ID}",
+      "permission": "Contributor",
+      "package": "data-engineer-sales-lakehouse",
+      "group": "sg-fabric-de-sales"
+    },
+    {
+      "principal": "omar.hassan@contoso.com",
+      "principal_type": "User",
+      "platform": "fabric",
+      "resource_type": "MirroredDatabase",
+      "resource": "sales-mirror-db",
+      "permission": "Read, ReadAll",
+      "package": "data-engineer-sales-lakehouse",
+      "group": "sg-fabric-de-sales"
+    },
+    {
+      "principal": "omar.hassan@contoso.com",
+      "principal_type": "User",
+      "platform": "fabric",
+      "resource_type": "SemanticModel",
+      "resource": "sales-default-model",
+      "permission": "Read",
+      "package": "data-engineer-sales-lakehouse",
+      "group": "sg-fabric-de-sales"
+    },
+    {
+      "principal": "omar.hassan@contoso.com",
+      "principal_type": "User",
+      "platform": "fabric",
+      "resource_type": "SQLEndpoint",
+      "resource": "sales-mirror-db-sqle",
+      "permission": "Read",
+      "package": "data-engineer-sales-lakehouse",
+      "group": "sg-fabric-de-sales"
+    },
+    {
+      "principal": "james.wilson@contoso.com",
+      "principal_type": "User",
+      "platform": "fabric",
+      "resource_type": "workspace",
+      "resource": "${WORKSPACE_SALES_ID}",
+      "permission": "Viewer",
+      "package": "data-office-sales-viewer",
+      "group": "sg-fabric-do-sales"
+    },
+    {
+      "principal": "james.wilson@contoso.com",
+      "principal_type": "User",
+      "platform": "fabric",
+      "resource_type": "MirroredDatabase",
+      "resource": "sales-mirror-db",
+      "permission": "Read",
+      "package": "data-office-sales-viewer",
+      "group": "sg-fabric-do-sales"
+    },
+    {
+      "principal": "james.wilson@contoso.com",
+      "principal_type": "User",
+      "platform": "fabric",
+      "resource_type": "SemanticModel",
+      "resource": "sales-default-model",
+      "permission": "Read",
+      "package": "data-office-sales-viewer",
+      "group": "sg-fabric-do-sales"
+    },
+    {
+      "principal": "sarah.johnson@contoso.com",
+      "principal_type": "User",
+      "platform": "fabric",
+      "resource_type": "workspace",
+      "resource": "${WORKSPACE_SALES_ID}",
+      "permission": "Viewer",
+      "package": "data-office-sales-viewer",
+      "group": "sg-fabric-do-sales"
+    },
+    {
+      "principal": "sarah.johnson@contoso.com",
+      "principal_type": "User",
+      "platform": "fabric",
+      "resource_type": "MirroredDatabase",
+      "resource": "sales-mirror-db",
+      "permission": "Read",
+      "package": "data-office-sales-viewer",
+      "group": "sg-fabric-do-sales"
+    },
+    {
+      "principal": "sarah.johnson@contoso.com",
+      "principal_type": "User",
+      "platform": "fabric",
+      "resource_type": "SemanticModel",
+      "resource": "sales-default-model",
+      "permission": "Read",
+      "package": "data-office-sales-viewer",
+      "group": "sg-fabric-do-sales"
+    },
+    {
+      "principal": "alex.chen@contoso.com",
+      "principal_type": "User",
+      "platform": "fabric",
+      "resource_type": "workspace",
+      "resource": "${DATABRICKS_WORKSPACE_ID}",
+      "permission": "Contributor",
+      "package": "databricks-engineer-sales",
+      "group": "sg-fabric-de-sales"
+    },
+    {
+      "principal": "alex.chen@contoso.com",
+      "principal_type": "User",
+      "platform": "databricks",
+      "resource_type": "Catalog",
+      "resource": "sales_catalog",
+      "permission": "USE_CATALOG",
+      "package": "databricks-engineer-sales",
+      "group": "sg-fabric-de-sales"
+    },
+    {
+      "principal": "alex.chen@contoso.com",
+      "principal_type": "User",
+      "platform": "databricks",
+      "resource_type": "Schema",
+      "resource": "sales_catalog.staging",
+      "permission": "USE_SCHEMA, SELECT, MODIFY, CREATE_TABLE, CREATE_VIEW",
+      "package": "databricks-engineer-sales",
+      "group": "sg-fabric-de-sales"
+    },
+    {
+      "principal": "alex.chen@contoso.com",
+      "principal_type": "User",
+      "platform": "databricks",
+      "resource_type": "Schema",
+      "resource": "sales_catalog.curated",
+      "permission": "USE_SCHEMA, SELECT",
+      "package": "databricks-engineer-sales",
+      "group": "sg-fabric-de-sales"
+    },
+    {
+      "principal": "alex.chen@contoso.com",
+      "principal_type": "User",
+      "platform": "databricks",
+      "resource_type": "Schema",
+      "resource": "sales_catalog.raw",
+      "permission": "USE_SCHEMA, SELECT",
+      "package": "databricks-engineer-sales",
+      "group": "sg-fabric-de-sales"
+    },
+    {
+      "principal": "alex.chen@contoso.com",
+      "principal_type": "User",
+      "platform": "databricks",
+      "resource_type": "Volume",
+      "resource": "sales_catalog.staging.etl_files",
+      "permission": "READ_VOLUME, WRITE_VOLUME",
+      "package": "databricks-engineer-sales",
+      "group": "sg-fabric-de-sales"
+    },
+    {
+      "principal": "alex.chen@contoso.com",
+      "principal_type": "User",
+      "platform": "databricks",
+      "resource_type": "ExternalLocation",
+      "resource": "adls-sales-raw",
+      "permission": "READ_FILES",
+      "package": "databricks-engineer-sales",
+      "group": "sg-fabric-de-sales"
+    },
+    {
+      "principal": "alex.chen@contoso.com",
+      "principal_type": "User",
+      "platform": "databricks",
+      "resource_type": "ClusterPolicy",
+      "resource": "",
+      "permission": "",
+      "package": "databricks-engineer-sales",
+      "group": "sg-fabric-de-sales"
+    },
+    {
+      "principal": "alex.chen@contoso.com",
+      "principal_type": "User",
+      "platform": "databricks",
+      "resource_type": "SQLWarehouse",
+      "resource": "",
+      "permission": "",
+      "package": "databricks-engineer-sales",
+      "group": "sg-fabric-de-sales"
+    },
+    {
+      "principal": "alex.chen@contoso.com",
+      "principal_type": "User",
+      "platform": "databricks",
+      "resource_type": "Notebook",
+      "resource": "",
+      "permission": "",
+      "package": "databricks-engineer-sales",
+      "group": "sg-fabric-de-sales"
+    },
+    {
+      "principal": "alex.chen@contoso.com",
+      "principal_type": "User",
+      "platform": "databricks",
+      "resource_type": "Repo",
+      "resource": "",
+      "permission": "",
+      "package": "databricks-engineer-sales",
+      "group": "sg-fabric-de-sales"
+    },
+    {
+      "principal": "omar.hassan@contoso.com",
+      "principal_type": "User",
+      "platform": "fabric",
+      "resource_type": "workspace",
+      "resource": "${DATABRICKS_WORKSPACE_ID}",
+      "permission": "Contributor",
+      "package": "databricks-engineer-sales",
+      "group": "sg-fabric-de-sales"
+    },
+    {
+      "principal": "omar.hassan@contoso.com",
+      "principal_type": "User",
+      "platform": "databricks",
+      "resource_type": "Catalog",
+      "resource": "sales_catalog",
+      "permission": "USE_CATALOG",
+      "package": "databricks-engineer-sales",
+      "group": "sg-fabric-de-sales"
+    },
+    {
+      "principal": "omar.hassan@contoso.com",
+      "principal_type": "User",
+      "platform": "databricks",
+      "resource_type": "Schema",
+      "resource": "sales_catalog.staging",
+      "permission": "USE_SCHEMA, SELECT, MODIFY, CREATE_TABLE, CREATE_VIEW",
+      "package": "databricks-engineer-sales",
+      "group": "sg-fabric-de-sales"
+    },
+    {
+      "principal": "omar.hassan@contoso.com",
+      "principal_type": "User",
+      "platform": "databricks",
+      "resource_type": "Schema",
+      "resource": "sales_catalog.curated",
+      "permission": "USE_SCHEMA, SELECT",
+      "package": "databricks-engineer-sales",
+      "group": "sg-fabric-de-sales"
+    },
+    {
+      "principal": "omar.hassan@contoso.com",
+      "principal_type": "User",
+      "platform": "databricks",
+      "resource_type": "Schema",
+      "resource": "sales_catalog.raw",
+      "permission": "USE_SCHEMA, SELECT",
+      "package": "databricks-engineer-sales",
+      "group": "sg-fabric-de-sales"
+    },
+    {
+      "principal": "omar.hassan@contoso.com",
+      "principal_type": "User",
+      "platform": "databricks",
+      "resource_type": "Volume",
+      "resource": "sales_catalog.staging.etl_files",
+      "permission": "READ_VOLUME, WRITE_VOLUME",
+      "package": "databricks-engineer-sales",
+      "group": "sg-fabric-de-sales"
+    },
+    {
+      "principal": "omar.hassan@contoso.com",
+      "principal_type": "User",
+      "platform": "databricks",
+      "resource_type": "ExternalLocation",
+      "resource": "adls-sales-raw",
+      "permission": "READ_FILES",
+      "package": "databricks-engineer-sales",
+      "group": "sg-fabric-de-sales"
+    },
+    {
+      "principal": "omar.hassan@contoso.com",
+      "principal_type": "User",
+      "platform": "databricks",
+      "resource_type": "ClusterPolicy",
+      "resource": "",
+      "permission": "",
+      "package": "databricks-engineer-sales",
+      "group": "sg-fabric-de-sales"
+    },
+    {
+      "principal": "omar.hassan@contoso.com",
+      "principal_type": "User",
+      "platform": "databricks",
+      "resource_type": "SQLWarehouse",
+      "resource": "",
+      "permission": "",
+      "package": "databricks-engineer-sales",
+      "group": "sg-fabric-de-sales"
+    },
+    {
+      "principal": "omar.hassan@contoso.com",
+      "principal_type": "User",
+      "platform": "databricks",
+      "resource_type": "Notebook",
+      "resource": "",
+      "permission": "",
+      "package": "databricks-engineer-sales",
+      "group": "sg-fabric-de-sales"
+    },
+    {
+      "principal": "omar.hassan@contoso.com",
+      "principal_type": "User",
+      "platform": "databricks",
+      "resource_type": "Repo",
+      "resource": "",
+      "permission": "",
+      "package": "databricks-engineer-sales",
+      "group": "sg-fabric-de-sales"
+    },
+    {
+      "principal": "priya.sharma@contoso.com",
+      "principal_type": "User",
+      "platform": "fabric",
+      "resource_type": "workspace",
+      "resource": "${DATABRICKS_WORKSPACE_ID}",
+      "permission": "Contributor",
+      "package": "databricks-ml-team-sales",
+      "group": "sg-fabric-ml-sales"
+    },
+    {
+      "principal": "priya.sharma@contoso.com",
+      "principal_type": "User",
+      "platform": "databricks",
+      "resource_type": "Catalog",
+      "resource": "sales_catalog",
+      "permission": "USE_CATALOG, BROWSE",
+      "package": "databricks-ml-team-sales",
+      "group": "sg-fabric-ml-sales"
+    },
+    {
+      "principal": "priya.sharma@contoso.com",
+      "principal_type": "User",
+      "platform": "databricks",
+      "resource_type": "Schema",
+      "resource": "sales_catalog.curated",
+      "permission": "USE_SCHEMA, SELECT",
+      "package": "databricks-ml-team-sales",
+      "group": "sg-fabric-ml-sales"
+    },
+    {
+      "principal": "priya.sharma@contoso.com",
+      "principal_type": "User",
+      "platform": "databricks",
+      "resource_type": "Catalog",
+      "resource": "ml_catalog",
+      "permission": "USE_CATALOG, CREATE_SCHEMA",
+      "package": "databricks-ml-team-sales",
+      "group": "sg-fabric-ml-sales"
+    },
+    {
+      "principal": "priya.sharma@contoso.com",
+      "principal_type": "User",
+      "platform": "databricks",
+      "resource_type": "Schema",
+      "resource": "ml_catalog.models",
+      "permission": "USE_SCHEMA, CREATE_MODEL, CREATE_FUNCTION, CREATE_TABLE, SELECT, MODIFY",
+      "package": "databricks-ml-team-sales",
+      "group": "sg-fabric-ml-sales"
+    },
+    {
+      "principal": "priya.sharma@contoso.com",
+      "principal_type": "User",
+      "platform": "databricks",
+      "resource_type": "Schema",
+      "resource": "ml_catalog.features",
+      "permission": "USE_SCHEMA, CREATE_TABLE, SELECT, MODIFY",
+      "package": "databricks-ml-team-sales",
+      "group": "sg-fabric-ml-sales"
+    },
+    {
+      "principal": "priya.sharma@contoso.com",
+      "principal_type": "User",
+      "platform": "databricks",
+      "resource_type": "Schema",
+      "resource": "ml_catalog.serving",
+      "permission": "USE_SCHEMA, CREATE_MODEL, SELECT, MODIFY",
+      "package": "databricks-ml-team-sales",
+      "group": "sg-fabric-ml-sales"
+    },
+    {
+      "principal": "priya.sharma@contoso.com",
+      "principal_type": "User",
+      "platform": "databricks",
+      "resource_type": "Volume",
+      "resource": "ml_catalog.models.artifacts",
+      "permission": "READ_VOLUME, WRITE_VOLUME",
+      "package": "databricks-ml-team-sales",
+      "group": "sg-fabric-ml-sales"
+    },
+    {
+      "principal": "priya.sharma@contoso.com",
+      "principal_type": "User",
+      "platform": "databricks",
+      "resource_type": "ClusterPolicy",
+      "resource": "",
+      "permission": "",
+      "package": "databricks-ml-team-sales",
+      "group": "sg-fabric-ml-sales"
+    },
+    {
+      "principal": "priya.sharma@contoso.com",
+      "principal_type": "User",
+      "platform": "databricks",
+      "resource_type": "SQLWarehouse",
+      "resource": "",
+      "permission": "",
+      "package": "databricks-ml-team-sales",
+      "group": "sg-fabric-ml-sales"
+    },
+    {
+      "principal": "priya.sharma@contoso.com",
+      "principal_type": "User",
+      "platform": "databricks",
+      "resource_type": "ServingEndpoint",
+      "resource": "",
+      "permission": "",
+      "package": "databricks-ml-team-sales",
+      "group": "sg-fabric-ml-sales"
+    },
+    {
+      "principal": "priya.sharma@contoso.com",
+      "principal_type": "User",
+      "platform": "databricks",
+      "resource_type": "Experiment",
+      "resource": "",
+      "permission": "",
+      "package": "databricks-ml-team-sales",
+      "group": "sg-fabric-ml-sales"
+    },
+    {
+      "principal": "priya.sharma@contoso.com",
+      "principal_type": "User",
+      "platform": "databricks",
+      "resource_type": "DLTPipeline",
+      "resource": "",
+      "permission": "",
+      "package": "databricks-ml-team-sales",
+      "group": "sg-fabric-ml-sales"
+    },
+    {
+      "principal": "priya.sharma@contoso.com",
+      "principal_type": "User",
+      "platform": "databricks",
+      "resource_type": "Job",
+      "resource": "",
+      "permission": "",
+      "package": "databricks-ml-team-sales",
+      "group": "sg-fabric-ml-sales"
+    },
+    {
+      "principal": "priya.sharma@contoso.com",
+      "principal_type": "User",
+      "platform": "databricks",
+      "resource_type": "Notebook",
+      "resource": "",
+      "permission": "",
+      "package": "databricks-ml-team-sales",
+      "group": "sg-fabric-ml-sales"
+    },
+    {
+      "principal": "lisa.tanaka@contoso.com",
+      "principal_type": "User",
+      "platform": "fabric",
+      "resource_type": "workspace",
+      "resource": "${DATABRICKS_WORKSPACE_ID}",
+      "permission": "Contributor",
+      "package": "databricks-ml-team-sales",
+      "group": "sg-fabric-ml-sales"
+    },
+    {
+      "principal": "lisa.tanaka@contoso.com",
+      "principal_type": "User",
+      "platform": "databricks",
+      "resource_type": "Catalog",
+      "resource": "sales_catalog",
+      "permission": "USE_CATALOG, BROWSE",
+      "package": "databricks-ml-team-sales",
+      "group": "sg-fabric-ml-sales"
+    },
+    {
+      "principal": "lisa.tanaka@contoso.com",
+      "principal_type": "User",
+      "platform": "databricks",
+      "resource_type": "Schema",
+      "resource": "sales_catalog.curated",
+      "permission": "USE_SCHEMA, SELECT",
+      "package": "databricks-ml-team-sales",
+      "group": "sg-fabric-ml-sales"
+    },
+    {
+      "principal": "lisa.tanaka@contoso.com",
+      "principal_type": "User",
+      "platform": "databricks",
+      "resource_type": "Catalog",
+      "resource": "ml_catalog",
+      "permission": "USE_CATALOG, CREATE_SCHEMA",
+      "package": "databricks-ml-team-sales",
+      "group": "sg-fabric-ml-sales"
+    },
+    {
+      "principal": "lisa.tanaka@contoso.com",
+      "principal_type": "User",
+      "platform": "databricks",
+      "resource_type": "Schema",
+      "resource": "ml_catalog.models",
+      "permission": "USE_SCHEMA, CREATE_MODEL, CREATE_FUNCTION, CREATE_TABLE, SELECT, MODIFY",
+      "package": "databricks-ml-team-sales",
+      "group": "sg-fabric-ml-sales"
+    },
+    {
+      "principal": "lisa.tanaka@contoso.com",
+      "principal_type": "User",
+      "platform": "databricks",
+      "resource_type": "Schema",
+      "resource": "ml_catalog.features",
+      "permission": "USE_SCHEMA, CREATE_TABLE, SELECT, MODIFY",
+      "package": "databricks-ml-team-sales",
+      "group": "sg-fabric-ml-sales"
+    },
+    {
+      "principal": "lisa.tanaka@contoso.com",
+      "principal_type": "User",
+      "platform": "databricks",
+      "resource_type": "Schema",
+      "resource": "ml_catalog.serving",
+      "permission": "USE_SCHEMA, CREATE_MODEL, SELECT, MODIFY",
+      "package": "databricks-ml-team-sales",
+      "group": "sg-fabric-ml-sales"
+    },
+    {
+      "principal": "lisa.tanaka@contoso.com",
+      "principal_type": "User",
+      "platform": "databricks",
+      "resource_type": "Volume",
+      "resource": "ml_catalog.models.artifacts",
+      "permission": "READ_VOLUME, WRITE_VOLUME",
+      "package": "databricks-ml-team-sales",
+      "group": "sg-fabric-ml-sales"
+    },
+    {
+      "principal": "lisa.tanaka@contoso.com",
+      "principal_type": "User",
+      "platform": "databricks",
+      "resource_type": "ClusterPolicy",
+      "resource": "",
+      "permission": "",
+      "package": "databricks-ml-team-sales",
+      "group": "sg-fabric-ml-sales"
+    },
+    {
+      "principal": "lisa.tanaka@contoso.com",
+      "principal_type": "User",
+      "platform": "databricks",
+      "resource_type": "SQLWarehouse",
+      "resource": "",
+      "permission": "",
+      "package": "databricks-ml-team-sales",
+      "group": "sg-fabric-ml-sales"
+    },
+    {
+      "principal": "lisa.tanaka@contoso.com",
+      "principal_type": "User",
+      "platform": "databricks",
+      "resource_type": "ServingEndpoint",
+      "resource": "",
+      "permission": "",
+      "package": "databricks-ml-team-sales",
+      "group": "sg-fabric-ml-sales"
+    },
+    {
+      "principal": "lisa.tanaka@contoso.com",
+      "principal_type": "User",
+      "platform": "databricks",
+      "resource_type": "Experiment",
+      "resource": "",
+      "permission": "",
+      "package": "databricks-ml-team-sales",
+      "group": "sg-fabric-ml-sales"
+    },
+    {
+      "principal": "lisa.tanaka@contoso.com",
+      "principal_type": "User",
+      "platform": "databricks",
+      "resource_type": "DLTPipeline",
+      "resource": "",
+      "permission": "",
+      "package": "databricks-ml-team-sales",
+      "group": "sg-fabric-ml-sales"
+    },
+    {
+      "principal": "lisa.tanaka@contoso.com",
+      "principal_type": "User",
+      "platform": "databricks",
+      "resource_type": "Job",
+      "resource": "",
+      "permission": "",
+      "package": "databricks-ml-team-sales",
+      "group": "sg-fabric-ml-sales"
+    },
+    {
+      "principal": "lisa.tanaka@contoso.com",
+      "principal_type": "User",
+      "platform": "databricks",
+      "resource_type": "Notebook",
+      "resource": "",
+      "permission": "",
+      "package": "databricks-ml-team-sales",
+      "group": "sg-fabric-ml-sales"
+    },
+    {
+      "principal": "spn-sales-pipeline@contoso.com",
+      "principal_type": "ServicePrincipal",
+      "platform": "fabric",
+      "resource_type": "workspace",
+      "resource": "${WORKSPACE_SALES_ID}",
+      "permission": "Contributor",
+      "package": "service-account-sales-automation",
+      "group": "sg-fabric-spn-sales"
+    },
+    {
+      "principal": "spn-sales-pipeline@contoso.com",
+      "principal_type": "ServicePrincipal",
+      "platform": "fabric",
+      "resource_type": "MirroredDatabase",
+      "resource": "sales-mirror-db",
+      "permission": "Read, ReadAll",
+      "package": "service-account-sales-automation",
+      "group": "sg-fabric-spn-sales"
+    },
+    {
+      "principal": "spn-sales-pipeline@contoso.com",
+      "principal_type": "ServicePrincipal",
+      "platform": "fabric",
+      "resource_type": "SemanticModel",
+      "resource": "sales-default-model",
+      "permission": "Read, Write, Execute",
+      "package": "service-account-sales-automation",
+      "group": "sg-fabric-spn-sales"
+    },
+    {
+      "principal": "spn-sales-pipeline@contoso.com",
+      "principal_type": "ServicePrincipal",
+      "platform": "fabric",
+      "resource_type": "DataPipeline",
+      "resource": "sales-ingestion-pipeline",
+      "permission": "Read, Execute",
+      "package": "service-account-sales-automation",
+      "group": "sg-fabric-spn-sales"
+    }
+  ]
+}
