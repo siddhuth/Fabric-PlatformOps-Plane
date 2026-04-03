@@ -50,3 +50,53 @@ variable "service_principals" {
   }))
   default = []
 }
+
+# ---------------------------------------------------------------------------
+# Databricks Variables
+# ---------------------------------------------------------------------------
+variable "databricks_host" {
+  description = "Databricks workspace URL (e.g., https://adb-xxx.y.azuredatabricks.net)."
+  type        = string
+  default     = ""
+}
+
+variable "databricks_workspace" {
+  description = "Databricks workspace configuration."
+  type = object({
+    name                        = string
+    sku                         = optional(string, "premium")
+    managed_resource_group_name = optional(string, "")
+    metastore_id                = optional(string, "")
+  })
+  default = null
+}
+
+variable "databricks_catalogs" {
+  description = "Unity Catalog catalogs to provision."
+  type = map(object({
+    comment = optional(string, "")
+    schemas = list(object({
+      name    = string
+      comment = string
+      grants = optional(list(object({
+        principal  = string
+        privileges = list(string)
+      })), [])
+    }))
+    catalog_grants = optional(list(object({
+      principal  = string
+      privileges = list(string)
+    })), [])
+  }))
+  default = {}
+}
+
+variable "databricks_scim_groups" {
+  description = "SCIM groups to provision in the Databricks workspace."
+  type = list(object({
+    display_name   = string
+    entra_group_id = string
+    entitlements   = list(string)
+  }))
+  default = []
+}
