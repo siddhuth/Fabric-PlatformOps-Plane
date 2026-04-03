@@ -63,3 +63,45 @@ module "workspaces" {
 
   git_provider_config = lookup(each.value, "git_config", null)
 }
+
+# ---------------------------------------------------------------------------
+# Databricks Workspace
+# ---------------------------------------------------------------------------
+module "databricks_workspace" {
+  source = "./modules/databricks-workspace"
+  count  = var.databricks_workspace != null ? 1 : 0
+
+  workspace_name              = var.databricks_workspace.name
+  resource_group_name         = var.resource_group_name
+  location                    = var.location
+  sku                         = var.databricks_workspace.sku
+  managed_resource_group_name = var.databricks_workspace.managed_resource_group_name
+  metastore_id                = var.databricks_workspace.metastore_id
+}
+
+# ---------------------------------------------------------------------------
+# Databricks Unity Catalog — Catalogs & Schemas
+# ---------------------------------------------------------------------------
+module "databricks_uc_catalog" {
+  source   = "./modules/databricks-uc-catalog"
+  for_each = var.databricks_catalogs
+
+  catalog_name   = each.key
+  catalog_comment = each.value.comment
+  schemas        = each.value.schemas
+  catalog_grants = each.value.catalog_grants
+
+  depends_on = [module.databricks_workspace]
+}
+
+# ---------------------------------------------------------------------------
+# Databricks SCIM — Groups, Entitlements, Membership
+# ---------------------------------------------------------------------------
+module "databricks_scim" {
+  source = "./modules/databricks-scim"
+  count  = length(var.databricks_scim_groups) > 0 ? 1 : 0
+
+  groups = var.databricks_scim_groups
+
+  depends_on = [module.databricks_workspace]
+}

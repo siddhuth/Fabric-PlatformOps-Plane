@@ -14,6 +14,10 @@ terraform {
       source  = "hashicorp/azuread"
       version = "~> 3.0"
     }
+    databricks = {
+      source  = "databricks/databricks"
+      version = "~> 1.60"
+    }
   }
 
   backend "azurerm" {
@@ -31,3 +35,10 @@ provider "azurerm" {
 }
 
 provider "azuread" {}
+
+provider "databricks" {
+  # Authentication via environment variables:
+  # DATABRICKS_HOST, DATABRICKS_CLIENT_ID, DATABRICKS_CLIENT_SECRET
+  # Or configure for Azure: DATABRICKS_AZURE_CLIENT_ID, etc.
+  host = var.databricks_host
+}
