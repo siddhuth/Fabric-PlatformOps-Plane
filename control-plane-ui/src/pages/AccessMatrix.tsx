@@ -1,7 +1,8 @@
 import { useState, useMemo } from 'react'
 import { useAccessMatrix } from '../hooks/useFixtureData'
-import PlatformBadge from '../components/PlatformBadge'
 import FilterBar from '../components/FilterBar'
+import PermissionCell, { GrantDetail } from '../components/PermissionCell'
+import SnowflakeComingSoon from '../components/SnowflakeComingSoon'
 
 export default function AccessMatrix() {
   const data = useAccessMatrix()
@@ -72,22 +73,7 @@ export default function AccessMatrix() {
       />
 
       {selectedEntry && (
-        <div className="mb-6 p-4 rounded-lg bg-white border border-gray-200 shadow-sm">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="font-semibold text-gray-900">Grant Detail</h3>
-            <button onClick={() => setSelected(null)} className="text-gray-400 hover:text-gray-600 text-sm">
-              Close
-            </button>
-          </div>
-          <dl className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-            <div><dt className="text-gray-500">Principal</dt><dd className="font-medium">{selectedEntry.principal}</dd></div>
-            <div><dt className="text-gray-500">Resource</dt><dd className="font-medium">{selectedEntry.resource_type}: {selectedEntry.resource || '(all)'}</dd></div>
-            <div><dt className="text-gray-500">Permission</dt><dd className="font-medium">{selectedEntry.permission || 'Per policy'}</dd></div>
-            <div><dt className="text-gray-500">Source Package</dt><dd className="font-medium">{selectedEntry.package}</dd></div>
-            <div><dt className="text-gray-500">Group</dt><dd className="font-medium">{selectedEntry.group}</dd></div>
-            <div><dt className="text-gray-500">Platform</dt><dd><PlatformBadge platform={selectedEntry.platform} /></dd></div>
-          </dl>
-        </div>
+        <GrantDetail entry={selectedEntry} onClose={() => setSelected(null)} />
       )}
 
       <div className="overflow-x-auto rounded-lg border border-gray-200">
@@ -115,31 +101,22 @@ export default function AccessMatrix() {
                 {resources.map((r) => {
                   const entry = cellMap.get(`${p}||${r}`)
                   return (
-                    <td
+                    <PermissionCell
                       key={r}
-                      className={`px-2 py-2 border-b text-center cursor-pointer transition-colors ${
-                        entry ? 'hover:bg-blue-50' : ''
-                      } ${
-                        selected?.principal === p && selected?.resource === r
-                          ? 'bg-blue-100 ring-2 ring-blue-400'
-                          : ''
-                      }`}
-                      onClick={() => entry && setSelected({ principal: p, resource: r })}
-                    >
-                      {entry ? (
-                        <span className={`inline-block w-3 h-3 rounded-full ${
-                          entry.platform === 'fabric' ? 'bg-blue-500' : 'bg-orange-500'
-                        }`} title={entry.permission || 'Per policy'} />
-                      ) : (
-                        <span className="text-gray-200">&mdash;</span>
-                      )}
-                    </td>
+                      entry={entry}
+                      isSelected={selected?.principal === p && selected?.resource === r}
+                      onClick={() => setSelected({ principal: p, resource: r })}
+                    />
                   )
                 })}
               </tr>
             ))}
           </tbody>
         </table>
+      </div>
+
+      <div className="mt-6">
+        <SnowflakeComingSoon />
       </div>
     </div>
   )

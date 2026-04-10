@@ -5,12 +5,14 @@ interface FilterBarProps {
   searchValue?: string
   onSearchChange?: (v: string) => void
   searchPlaceholder?: string
+  showSnowflake?: boolean
 }
 
 const labels: Record<string, string> = {
   all: 'All',
   fabric: 'Fabric',
   databricks: 'Databricks',
+  snowflake: 'Snowflake',
 }
 
 export default function FilterBar({
@@ -20,6 +22,7 @@ export default function FilterBar({
   searchValue,
   onSearchChange,
   searchPlaceholder = 'Search...',
+  showSnowflake = true,
 }: FilterBarProps) {
   return (
     <div className="flex flex-wrap items-center gap-3 mb-6">
@@ -37,6 +40,12 @@ export default function FilterBar({
             {labels[p] ?? p}
           </button>
         ))}
+        {showSnowflake && !platforms.includes('snowflake') && (
+          <span className="px-3 py-1.5 text-sm font-medium text-cyan-400 cursor-default" title="Phase 3 — Q3 2026">
+            Snowflake
+            <span className="ml-1 text-[10px] align-super">soon</span>
+          </span>
+        )}
       </div>
       {onSearchChange && (
         <input

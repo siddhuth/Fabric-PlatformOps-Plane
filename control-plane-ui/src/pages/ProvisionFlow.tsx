@@ -2,7 +2,8 @@ import { useReducer, useEffect, useCallback } from 'react'
 import { useProvisioningEvents } from '../hooks/useFixtureData'
 import PlatformBadge from '../components/PlatformBadge'
 import StatusBadge from '../components/StatusBadge'
-import { platformColors } from '../lib/platformColors'
+import AnimatedStep from '../components/AnimatedStep'
+
 
 interface AnimState {
   selectedId: string | null
@@ -90,6 +91,13 @@ export default function ProvisionFlow() {
             </p>
           </button>
         ))}
+
+        {/* Snowflake placeholder card */}
+        <div className="p-4 rounded-lg border-2 border-dashed border-cyan-200 bg-cyan-50/50 opacity-60 flex flex-col items-center justify-center text-center">
+          <div className="w-8 h-8 rounded-lg bg-cyan-100 flex items-center justify-center text-cyan-600 font-bold text-xs mb-2">SF</div>
+          <p className="text-sm font-medium text-cyan-600">Snowflake Traces</p>
+          <span className="text-xs bg-cyan-100 text-cyan-600 rounded-full px-2 py-0.5 mt-1">Coming Soon</span>
+        </div>
       </div>
 
       {trace && (
@@ -114,39 +122,9 @@ export default function ProvisionFlow() {
           <div className="relative">
             <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-gray-200" />
             <div className="space-y-0">
-              {trace.steps.map((step, i) => {
-                const visible = i < state.visibleSteps
-                const colors = platformColors[step.platform] ?? platformColors.all
-                return (
-                  <div
-                    key={step.seq}
-                    className={`relative pl-10 py-3 transition-all duration-300 ${
-                      visible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
-                    }`}
-                  >
-                    <div className={`absolute left-2.5 top-4 w-3 h-3 rounded-full border-2 border-white shadow ${
-                      step.status === 'success' ? 'bg-green-500' : step.status === 'failed' ? 'bg-red-500' : 'bg-gray-400'
-                    }`} />
-
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <div className="flex items-center gap-2 mb-1">
-                          <PlatformBadge platform={step.platform} />
-                          <span className={`text-xs font-medium px-2 py-0.5 rounded ${colors.bg} ${colors.text}`}>
-                            {step.layer}
-                          </span>
-                          <span className="text-xs text-gray-500 font-mono">{step.duration_ms}ms</span>
-                        </div>
-                        <p className="text-sm font-medium text-gray-900">
-                          {step.action}: {step.target}
-                        </p>
-                        <p className="text-xs text-gray-500 mt-0.5">{step.detail}</p>
-                      </div>
-                      <StatusBadge status={step.status} />
-                    </div>
-                  </div>
-                )
-              })}
+              {trace.steps.map((step, i) => (
+                <AnimatedStep key={step.seq} step={step} visible={i < state.visibleSteps} />
+              ))}
             </div>
           </div>
         </div>

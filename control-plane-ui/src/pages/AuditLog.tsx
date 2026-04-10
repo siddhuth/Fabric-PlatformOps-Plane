@@ -3,6 +3,7 @@ import { useAuditLog } from '../hooks/useFixtureData'
 import PlatformBadge from '../components/PlatformBadge'
 import StatusBadge from '../components/StatusBadge'
 import FilterBar from '../components/FilterBar'
+import SnowflakeComingSoon from '../components/SnowflakeComingSoon'
 import { platformColors } from '../lib/platformColors'
 
 const actionLabels: Record<string, string> = {
@@ -121,6 +122,10 @@ export default function AuditLog() {
       {filtered.length === 0 && (
         <p className="text-center text-gray-400 py-12">No events match filters.</p>
       )}
+
+      <div className="mt-6">
+        <SnowflakeComingSoon />
+      </div>
     </div>
   )
 }
