@@ -2,19 +2,35 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import path from 'path'
-import { copyFileSync, mkdirSync, readdirSync } from 'fs'
+import fs from 'fs'
 
-// Copy fixture JSON files into dist/data/ on production build
-function copyFixtures() {
+const fixturesDir = path.resolve(__dirname, '../demo/fixtures')
+
+// Serves fixture JSON at /data/* in dev, copies to dist/data/ on build
+function fixtureData(): import('vite').Plugin {
   return {
-    name: 'copy-fixtures',
+    name: 'fixture-data',
+
+    // Dev: serve /data/foo.json from ../demo/fixtures/foo.json
+    configureServer(server) {
+      server.middlewares.use('/data', (req, res, next) => {
+        const file = path.join(fixturesDir, req.url!.replace(/^\//, ''))
+        if (fs.existsSync(file) && file.endsWith('.json')) {
+          res.setHeader('Content-Type', 'application/json')
+          fs.createReadStream(file).pipe(res)
+        } else {
+          next()
+        }
+      })
+    },
+
+    // Build: copy fixtures into dist/data/
     writeBundle() {
-      const src = path.resolve(__dirname, '../demo/fixtures')
       const dest = path.resolve(__dirname, 'dist/data')
-      mkdirSync(dest, { recursive: true })
-      for (const file of readdirSync(src)) {
+      fs.mkdirSync(dest, { recursive: true })
+      for (const file of fs.readdirSync(fixturesDir)) {
         if (file.endsWith('.json')) {
-          copyFileSync(path.join(src, file), path.join(dest, file))
+          fs.copyFileSync(path.join(fixturesDir, file), path.join(dest, file))
         }
       }
     },
@@ -22,7 +38,5 @@ function copyFixtures() {
 }
 
 export default defineConfig({
-  plugins: [react(), tailwindcss(), copyFixtures()],
-  // In dev, serve the repo root so /data/... can resolve via public dir symlink
-  publicDir: 'public',
+  plugins: [react(), tailwindcss(), fixtureData()],
 })
