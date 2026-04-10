@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react'
 import type { PlatformSummary, AccessMatrix, ProvisioningEvents, AuditLog, DriftResults } from '../types'
 
-const BASE = '../../demo/fixtures'
+// In dev: Vite serves public/data/ (symlink to demo/fixtures/)
+// In prod: copyFixtures plugin copies JSON into dist/data/
+const BASE = '/data'
 
 async function load<T>(file: string): Promise<T> {
   const res = await fetch(`${BASE}/${file}`)
+  if (!res.ok) throw new Error(`Failed to load ${file}: ${res.status}`)
   return res.json()
 }
 
