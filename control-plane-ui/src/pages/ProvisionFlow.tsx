@@ -1,38 +1,56 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useReducer, useEffect, useCallback } from 'react'
 import { useProvisioningEvents } from '../hooks/useFixtureData'
 import PlatformBadge from '../components/PlatformBadge'
 import StatusBadge from '../components/StatusBadge'
 import { platformColors } from '../lib/platformColors'
 
+interface AnimState {
+  selectedId: string | null
+  visibleSteps: number
+  playing: boolean
+}
+
+type AnimAction =
+  | { type: 'select'; id: string }
+  | { type: 'replay' }
+  | { type: 'tick' }
+  | { type: 'stop' }
+
+function animReducer(state: AnimState, action: AnimAction): AnimState {
+  switch (action.type) {
+    case 'select':
+      return { selectedId: action.id, visibleSteps: 0, playing: true }
+    case 'replay':
+      return { ...state, visibleSteps: 0, playing: true }
+    case 'tick':
+      return { ...state, visibleSteps: state.visibleSteps + 1 }
+    case 'stop':
+      return { ...state, playing: false }
+  }
+}
+
 export default function ProvisionFlow() {
   const data = useProvisioningEvents()
-  const [selectedId, setSelectedId] = useState<string | null>(null)
-  const [visibleSteps, setVisibleSteps] = useState(0)
-  const [playing, setPlaying] = useState(false)
+  const [state, dispatch] = useReducer(animReducer, {
+    selectedId: null,
+    visibleSteps: 0,
+    playing: false,
+  })
 
-  const trace = data?.traces.find((t) => t.trace_id === selectedId) ?? null
+  const trace = data?.traces.find((t) => t.trace_id === state.selectedId) ?? null
 
-  const replay = useCallback(() => {
-    setVisibleSteps(0)
-    setPlaying(true)
-  }, [])
+  const selectTrace = useCallback((id: string) => dispatch({ type: 'select', id }), [])
+  const replay = useCallback(() => dispatch({ type: 'replay' }), [])
 
   useEffect(() => {
-    if (!playing || !trace) return
-    if (visibleSteps >= trace.steps.length) {
-      setPlaying(false)
+    if (!state.playing || !trace) return
+    if (state.visibleSteps >= trace.steps.length) {
+      dispatch({ type: 'stop' })
       return
     }
-    const timer = setTimeout(() => setVisibleSteps((v) => v + 1), 400)
+    const timer = setTimeout(() => dispatch({ type: 'tick' }), 400)
     return () => clearTimeout(timer)
-  }, [playing, visibleSteps, trace])
-
-  useEffect(() => {
-    if (trace) {
-      setVisibleSteps(0)
-      setPlaying(true)
-    }
-  }, [trace])
+  }, [state.playing, state.visibleSteps, trace])
 
   if (!data) return <p className="text-gray-500">Loading...</p>
 
@@ -49,9 +67,9 @@ export default function ProvisionFlow() {
         {data.traces.map((t) => (
           <button
             key={t.trace_id}
-            onClick={() => setSelectedId(t.trace_id)}
+            onClick={() => selectTrace(t.trace_id)}
             className={`text-left p-4 rounded-lg border-2 transition-all ${
-              selectedId === t.trace_id
+              state.selectedId === t.trace_id
                 ? 'border-blue-500 bg-blue-50 shadow-sm'
                 : 'border-gray-200 bg-white hover:border-gray-300'
             }`}
@@ -97,7 +115,7 @@ export default function ProvisionFlow() {
             <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-gray-200" />
             <div className="space-y-0">
               {trace.steps.map((step, i) => {
-                const visible = i < visibleSteps
+                const visible = i < state.visibleSteps
                 const colors = platformColors[step.platform] ?? platformColors.all
                 return (
                   <div
