@@ -1,89 +1,147 @@
 # Fabric Access Platform
 
-A platform operations framework for automating Microsoft Fabric item-level permission management at enterprise scale.
+A multi-platform access control plane for **Microsoft Fabric**, **Azure Databricks** (Unity Catalog), and **Snowflake** (planned). Automates persona-based permission management at enterprise scale through Git-driven YAML definitions, event-driven provisioning, and a stakeholder-facing demo dashboard.
 
 ## Problem
 
-Fabric's native permission model works for small teams but breaks at enterprise scale:
-
-- **No Access Packages** — No native concept of bundled permission sets mapped to personas
-- **Limited Write APIs** — Fabric REST API can resolve permissions but has limited official support for granting them programmatically
-- **No Request Workflow** — No built-in self-service request → approval → provisioning lifecycle
-- **Manual Sharing** — Item permissions assigned through UI clicks with no audit trail or repeatability
+Enterprise data platforms lack native, cross-platform access packages that bundle permissions across multiple layers (workspace roles, item-level sharing, compute-level security grants) into a single, auditable, Git-driven unit.
 
 ## Solution Architecture
 
-This framework layers **Entra ID Governance** (request lifecycle) + **Custom Automation** (Azure Functions) + **Terraform** (infrastructure-as-code) to deliver a scalable, auditable, Git-driven access management control plane.
-
 ```
-┌─────────────────────────────────────────────────────────┐
-│  REQUEST LAYER — Entra ID Governance                    │
-│  Access Packages · Approval Workflows · Lifecycle       │
-└──────────────────────────┬──────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────────┐
+│  REQUEST LAYER — Entra ID Governance                                    │
+│  Access Packages · Approval Workflows · Lifecycle Policies              │
+└──────────────────────────┬──────────────────────────────────────────────┘
                            │ Group membership event
                            ▼
-┌─────────────────────────────────────────────────────────┐
-│  AUTOMATION LAYER — Azure Functions + Config Library    │
-│  YAML Definitions · Provisioning Functions · API Client │
-└──────────────────────────┬──────────────────────────────┘
-                           │ Multi-layer permission grants
-                           ▼
-┌─────────────────────────────────────────────────────────┐
-│  FABRIC LAYER — Workspace Roles, Items, Compute         │
-│  Workspace Roles · Item Sharing · T-SQL · OneLake       │
-└─────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────────┐
+│  PROVIDER REGISTRY — Platform-Aware Dispatch                            │
+│  ┌──────────────────┐ ┌────────────────────┐ ┌────────────────────────┐ │
+│  │  FabricProvider   │ │ DatabricksProvider │ │ SnowflakeProvider      │ │
+│  │  fabric_client.py │ │ databricks_client  │ │ (stub — Phase 3)      │ │
+│  │  sql_grants.py    │ │ uc_grants.py       │ │                       │ │
+│  └──────────────────┘ └────────────────────┘ └────────────────────────┘ │
+│  MockProvider (DEMO_MODE=true) — fixture-driven, no cloud credentials   │
+└──────────────────────────┬──────────────────────────────────────────────┘
+                           │
+          ┌────────────────┼────────────────┐
+          ▼                ▼                ▼
+   ┌─────────────┐  ┌───────────────┐  ┌──────────────┐
+   │   FABRIC     │  │  DATABRICKS   │  │  SNOWFLAKE   │
+   │  Workspace   │  │  Workspace    │  │  (Phase 3)   │
+   │  Items       │  │  Unity Catalog│  │              │
+   │  SQL / Lake  │  │  Compute ACLs │  │              │
+   └─────────────┘  └───────────────┘  └──────────────┘
+```
+
+## Quick Start — Run the Demo
+
+The demo dashboard runs entirely from fixture data with no cloud credentials required.
+
+```bash
+# 1. Install UI dependencies
+cd control-plane-ui
+npm install
+
+# 2. Start the dev server
+npm run dev
+```
+
+Open `http://localhost:5173` to explore:
+
+| Page | Route | What you'll see |
+|------|-------|-----------------|
+| **Platform Overview** | `/` | Fabric, Databricks, Snowflake cards with live stats |
+| **Access Matrix** | `/access-matrix` | Principal x resource grid — click any cell for grant detail |
+| **Provisioning Flow** | `/provisioning` | Animated step-by-step trace replay across platforms |
+| **Audit Log** | `/audit-log` | 55 events over 30 days with platform-colored timeline |
+| **Drift Dashboard** | `/drift` | 9 findings with expected-vs-actual diff display |
+
+### Regenerate Fixture Data
+
+If you modify access package YAML definitions, regenerate the demo data:
+
+```bash
+python demo/generate_fixtures.py --seed 42
+```
+
+### Build for Deployment
+
+```bash
+cd control-plane-ui
+npm run build     # Output in dist/ — deploy to any static host
 ```
 
 ## Repository Structure
 
 ```
 fabric-access-platform/
-├── terraform/
-│   ├── modules/workspace/          # Workspace + role assignment modules
-│   ├── modules/entra-groups/       # Security group + access package setup
-│   ├── modules/capacity/           # Fabric capacity provisioning
-│   └── environments/               # dev / staging / prod tfvars
 ├── access-packages/
 │   ├── definitions/                # YAML persona → permission mappings
-│   │   ├── data-engineer.yaml
-│   │   ├── data-office.yaml
-│   │   ├── analytics-team.yaml
-│   │   └── service-account.yaml
-│   └── schemas/                    # JSON Schema for package validation
+│   │   ├── data-engineer.yaml          # Fabric-only
+│   │   ├── data-office.yaml            # Fabric-only
+│   │   ├── analytics-team.yaml         # Fabric-only
+│   │   ├── service-account.yaml        # Fabric-only
+│   │   ├── databricks-engineer.yaml    # Multi-platform (Fabric + Databricks)
+│   │   └── databricks-ml-team.yaml     # Multi-platform (Fabric + Databricks)
+│   └── schemas/
+│       └── access-package.schema.json  # JSON Schema v7 (Fabric + Databricks + Snowflake)
 ├── functions/
-│   ├── provision-access/           # Triggered by Entra group change events
-│   ├── revoke-access/              # Triggered by removal / expiration
-│   ├── drift-detector/             # Scheduled scan: config vs actual state
+│   ├── provision-access/           # Azure Function: Entra group-add → multi-platform provision
+│   ├── revoke-access/              # Azure Function: group-remove → revocation
+│   ├── drift-detector/             # Azure Function: scheduled drift scan
 │   └── shared/
-│       ├── fabric_client.py        # Wrapper around Fabric + PBI REST APIs
-│       └── sql_grants.py           # T-SQL GRANT/REVOKE generator
-├── control-plane-ui/               # React app for platform team dashboard
-│   └── src/views/
-│       ├── audit-log/
-│       ├── access-matrix/
-│       └── override-panel/
+│       ├── provider_registry.py        # PlatformProvider ABC + factory
+│       ├── fabric_client.py            # Fabric REST + Power BI API wrapper
+│       ├── databricks_client.py        # Databricks OAuth M2M + workspace ACLs
+│       ├── databricks_uc_grants.py     # Unity Catalog SQL GRANT/REVOKE
+│       ├── mock_providers.py           # Demo mode implementations
+│       └── sql_grants.py               # T-SQL GRANT/REVOKE generator
+├── terraform/
+│   ├── modules/
+│   │   ├── workspace/              # Fabric workspace provisioning
+│   │   ├── capacity/               # Fabric capacity provisioning
+│   │   ├── entra-groups/           # Entra security groups
+│   │   ├── databricks-workspace/   # Azure Databricks workspace + metastore
+│   │   ├── databricks-uc-catalog/  # Unity Catalog (catalogs, schemas, tables)
+│   │   └── databricks-scim/        # SCIM group sync + entitlements
+│   └── environments/
+│       └── dev/terraform.tfvars
+├── control-plane-ui/               # React 18 + TypeScript + Vite + Tailwind
+│   └── src/
+│       ├── pages/                      # 5 navigable pages
+│       ├── components/                 # Reusable UI components
+│       ├── hooks/                      # Fixture data loading hooks
+│       └── lib/                        # Platform colors and utilities
+├── demo/
+│   ├── generate_fixtures.py        # Reads YAMLs → produces fixture JSONs
+│   └── fixtures/                   # 6 fixture files for the UI demo
 ├── scripts/
-│   ├── bootstrap.sh                # Initial Entra app registration + perms
-│   └── validate_packages.py        # CI check for access package configs
+│   ├── bootstrap.sh                # One-time Entra app registration + permissions
+│   └── validate_packages.py       # CI validation with UC prerequisite checks
 ├── .github/workflows/
-│   ├── terraform-plan.yml
-│   ├── deploy-functions.yml
-│   └── validate-access-packages.yml
+│   ├── validate-packages.yml       # PR validation of access-packages YAML
+│   ├── build-ui.yml                # React app lint + build check
+│   ├── terraform-validate.yml      # Terraform module validation
+│   ├── sync-fixtures.yml           # Auto-regenerate fixtures on YAML change
+│   └── deploy-demo.yml             # Manual dispatch → GitHub Pages or Azure SWA
 └── docs/
-    ├── architecture.md
-    └── runbook.md
+    ├── V2.0-LAUNCH-NOTES.md        # Staged rollout plan + Databricks design decisions
+    ├── architecture.md             # Technical architecture deep dive
+    └── runbook.md                  # Operational procedures
 ```
 
 ## Persona Access Packages
 
-Each persona maps to a YAML-defined access package that bundles workspace role, item permissions, and compute-level grants:
-
-| Persona | Workspace Role | Item Permissions | Compute-Level Grants |
-|---------|---------------|-----------------|---------------------|
-| Data Engineer | Contributor | Read, ReadAll | SQL: SELECT+INSERT on staging, OneLake: Read /Tables/* |
-| Data Office / Steward | Viewer | Read (view only) | SQL: SELECT on curated views, Semantic Model: RLS |
-| Analytics Team | Viewer | Read, Build | Semantic Model: Read+Build, SQL: SELECT analytics |
-| Service Account (SPN) | Contributor | Read, ReadAll, Execute | SQL: db_datareader, OneLake: ReadAll |
+| Persona | Platforms | Workspace Role | Key Grants |
+|---------|-----------|---------------|------------|
+| Data Engineer | Fabric | Contributor | Item Read/ReadAll, SQL SELECT+INSERT on staging |
+| Data Office | Fabric | Viewer | Item Read, SQL SELECT on curated views |
+| Analytics Team | Fabric | Viewer | Read+Build semantic models, SQL SELECT |
+| Service Account | Fabric | Contributor | Read/ReadAll/Execute, SQL db_datareader |
+| Databricks Engineer | Fabric + Databricks | Contributor | UC grants (staging r/w, curated r/o), workspace ACLs, SCIM |
+| Databricks ML Team | Fabric + Databricks | Contributor | UC model registry, feature tables, serving endpoints, DLT |
 
 ## End-to-End Flow
 
@@ -91,49 +149,35 @@ Each persona maps to a YAML-defined access package that bundles workspace role, 
 2. **Approval workflow** runs (manager + platform team approval chain)
 3. **Group membership updated** — user added to Entra security group
 4. **Event fires webhook** — Microsoft Graph subscription triggers Azure Function
-5. **Function reads YAML config** and orchestrates multi-layer permission grants
-6. **Permissions propagated** across workspace roles, item sharing, SQL grants, OneLake roles
+5. **Provider registry dispatches** to platform-specific providers (Fabric, Databricks, or both)
+6. **Permissions propagated** across workspace roles, item sharing, UC grants, workspace ACLs, SCIM entitlements
 7. **Audit event logged** to Log Analytics; scheduled drift detector validates state
+
+## CI/CD
+
+| Workflow | Trigger | Action |
+|----------|---------|--------|
+| `validate-packages.yml` | PR to `access-packages/` | Schema + UC prerequisite validation |
+| `build-ui.yml` | PR to `control-plane-ui/` | Lint + TypeScript + Vite build |
+| `terraform-validate.yml` | PR to `terraform/` | `terraform validate` for all 6 modules |
+| `sync-fixtures.yml` | PR to `access-packages/` | Regenerate fixtures, auto-commit |
+| `deploy-demo.yml` | Manual dispatch | Build UI → deploy to GitHub Pages or Azure SWA |
 
 ## Prerequisites
 
 - Azure subscription with Fabric capacity provisioned
 - Entra ID P2 license (for Access Packages / Identity Governance)
-- Terraform >= 1.8, < 2.0
-- Python 3.11+ (Azure Functions runtime)
-- Node.js 18+ (control plane UI)
+- Terraform >= 1.7
+- Python 3.11+ (Azure Functions runtime, `pyyaml` and `jsonschema` for validation)
+- Node.js 20+ (control plane UI)
 - Azure CLI authenticated with sufficient privileges
 
-## Quick Start
-
-```bash
-# 1. Bootstrap Entra app registration and permissions
-./scripts/bootstrap.sh
-
-# 2. Initialize and apply Terraform
-cd terraform/environments/dev
-terraform init
-terraform plan -out=tfplan
-terraform apply tfplan
-
-# 3. Deploy Azure Functions
-func azure functionapp publish <your-function-app-name>
-
-# 4. Validate access package configs
-python scripts/validate_packages.py
-```
-
-## Phased Implementation
-
-| Phase | Timeline | Deliverables |
-|-------|----------|-------------|
-| **Foundation** | Weeks 1-4 | YAML definitions, Entra groups, Terraform modules, workspace deployment |
-| **Automation** | Weeks 5-8 | Azure Functions, API client library, event wiring, SQL grant scripts |
-| **Control Plane** | Weeks 9-12 | Platform dashboard, Entra Access Packages integration, audit logging, drift reconciliation |
+For demo only: **Node.js 20+** is the only requirement.
 
 ## Documentation
 
-- [Architecture Deep Dive](docs/architecture.md) — Detailed technical architecture and design decisions
+- [V2.0 Launch Notes](docs/V2.0-LAUNCH-NOTES.md) — Multi-platform rollout plan, Databricks permission model, branch dependency graph
+- [Architecture Deep Dive](docs/architecture.md) — Technical architecture and design decisions
 - [Operations Runbook](docs/runbook.md) — Day-to-day operational procedures and troubleshooting
 
 ## License
