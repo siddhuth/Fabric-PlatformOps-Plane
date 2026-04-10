@@ -1,0 +1,36 @@
+name: Validate Access Packages
+
+on:
+  pull_request:
+    paths:
+      - 'access-packages/**'
+      - 'scripts/validate_packages.py'
+
+jobs:
+  validate:
+    name: Validate YAML packages
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install pyyaml jsonschema
+
+      - name: Validate access packages
+        run: python scripts/validate_packages.py --strict
+
+      - name: Verify Snowflake schema syntax
+        run: |
+          python -c "
+          import json
+          schema = json.load(open('access-packages/schemas/access-package.schema.json'))
+          platforms = schema.get('properties', {}).get('platforms', {}).get('properties', {})
+          assert 'snowflake' in platforms, 'Snowflake platform missing from schema'
+          print('Snowflake schema structure is syntactically valid')
+          "

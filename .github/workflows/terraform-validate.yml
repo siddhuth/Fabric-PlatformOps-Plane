@@ -1,0 +1,61 @@
+name: Terraform Validate
+
+on:
+  pull_request:
+    paths:
+      - 'terraform/**'
+
+jobs:
+  validate:
+    name: Validate Terraform modules
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: '1.7'
+
+      - name: Validate root module
+        working-directory: terraform
+        run: |
+          terraform init -backend=false
+          terraform validate
+
+      - name: Validate workspace module
+        working-directory: terraform/modules/workspace
+        run: |
+          terraform init -backend=false
+          terraform validate
+
+      - name: Validate capacity module
+        working-directory: terraform/modules/capacity
+        run: |
+          terraform init -backend=false
+          terraform validate
+
+      - name: Validate entra-groups module
+        working-directory: terraform/modules/entra-groups
+        run: |
+          terraform init -backend=false
+          terraform validate
+
+      - name: Validate databricks-workspace module
+        working-directory: terraform/modules/databricks-workspace
+        run: |
+          terraform init -backend=false
+          terraform validate
+
+      - name: Validate databricks-uc-catalog module
+        working-directory: terraform/modules/databricks-uc-catalog
+        run: |
+          terraform init -backend=false
+          terraform validate
+
+      - name: Validate databricks-scim module
+        working-directory: terraform/modules/databricks-scim
+        run: |
+          terraform init -backend=false
+          terraform validate
