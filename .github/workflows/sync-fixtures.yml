@@ -1,0 +1,46 @@
+name: Sync Fixtures
+
+on:
+  pull_request:
+    paths:
+      - 'access-packages/definitions/**'
+      - 'demo/generate_fixtures.py'
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    name: Regenerate fixtures
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install pyyaml
+
+      - name: Regenerate fixtures
+        run: python demo/generate_fixtures.py --seed 42
+
+      - name: Check for changes
+        id: diff
+        run: |
+          git diff --quiet demo/fixtures/ && echo "changed=false" >> "$GITHUB_OUTPUT" || echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Commit updated fixtures
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add demo/fixtures/
+          git commit -m "chore: regenerate fixtures from updated YAML packages"
+          git push
